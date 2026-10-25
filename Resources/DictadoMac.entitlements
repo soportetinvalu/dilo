@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Permiso de micrófono (necesario si se firma con "hardened runtime"). -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <!-- Sin App Sandbox a propósito: la app necesita un tap global de teclado,
+         enviar ⌘V a otras apps y ejecutar el CLI codex. -->
+</dict>
+</plist>
