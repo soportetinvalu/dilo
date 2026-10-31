@@ -1,0 +1,51 @@
+DILO — PARA CHRISTIAN
+
+Este paquete actualiza el nombre y el icono de Dictado.
+NO contiene una app ya compilada: se prepara en tu propio Mac.
+Esta actualización aún NO se ha compilado ni probado en macOS.
+
+1. Deja juntos todos los archivos de esta carpeta.
+2. Cierra Dictado/Dilo desde el micrófono de la barra superior → Salir.
+3. Haz doble clic en Actualizar Dilo.command y pulsa Continuar.
+4. Espera a que termine: puede tardar varios minutos y necesita internet.
+   Terminal se abre sola: no necesitas escribir comandos.
+   Si macOS solicita acceso de Terminal a Descargas o a la carpeta del paquete,
+   permítelo si corresponde a la carpeta que estás usando. No hace falta
+   Acceso total al disco. Si lo denegaste, consulta LEEME CHRISTIAN.txt.
+5. Dilo se abrirá y quedará en tu carpeta de usuario → Aplicaciones → Dilo.
+
+Si faltan herramientas de Apple, abre Instalar herramientas.command,
+completa el instalador y vuelve a intentar la actualización.
+Necesitas Apple Silicon, macOS 14+ y Swift 6+ (Xcode 16 o posterior).
+Si las herramientas ya estaban instaladas pero son antiguas, actualízalas
+desde Ajustes del Sistema → General → Actualización de software.
+
+Si macOS bloquea un .command o la app, lee el aviso:
+- Solo «desarrollador no identificado» o no puede verificar al desarrollador:
+  si reconoces este paquete, revisa Ajustes del Sistema → Privacidad y seguridad
+  → Abrir igualmente, si aparece para ese archivo.
+- Si advierte de malware, dice que «dañará tu ordenador» o que está dañado,
+  detente: no lo abras ni eludas el aviso. Guarda una captura y pide ayuda.
+- Si falta permiso de lectura/ejecución o no se resuelve, consulta la guía .txt
+  o pide ayuda con una captura. No desactives las protecciones de macOS.
+
+No se borra Dictado, ni tus ajustes, ni el modelo de voz.
+Si había otra Dilo de este proyecto se conserva en Dilo-respaldo.XXXXXX.
+Comprueba que Pulir con ChatGPT siga apagado, como lo tenías.
+La firma ad hoc puede hacer que macOS pida permisos de nuevo; no siempre ocurre.
+Si figuran activos pero no funcionan, abre LEEME CHRISTIAN.txt: explica cómo
+cerrar Dilo, quitar solo su entrada de privacidad si hay botón −, añadir la
+copia actual con + y activarla, o apagar y encender el permiso si no hay −/+.
+Quitar una entrada de privacidad no elimina la app. No se restablecen permisos
+automáticamente y volver a concederlos no garantiza resolver el fallo.
+
+El icono de tu imagen se verá en Finder y los diálogos del sistema.
+La barra superior sigue usando el micrófono de estado y no hay icono fijo en el Dock.
+
+Prueba en una nota vacía: usa tu tecla habitual y di una frase corta.
+Si necesitas volver atrás, sal de Dilo y abre tu Dictado original.
+No abras las dos copias a la vez. Si Dictado inicia con el Mac, revisa los
+Ítems de inicio después de comprobar Dilo: este paquete no los cambia.
+
+Abre con doble clic la guía completa: LEEME CHRISTIAN.txt.
+Pruebas técnicas y límites: VERIFICACION.md.

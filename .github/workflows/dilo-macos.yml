@@ -1,0 +1,93 @@
+name: Dilo macOS Apple Silicon
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'feat/**', 'ci/**']
+    paths-ignore: ['**.md', '**.txt']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dilo-macos-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # macos-14 es arm64 según la tabla actual de GitHub; la guarda evita Rosetta/Intel.
+    runs-on: macos-14
+    timeout-minutes: 60
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '14.0'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Comprobar plataforma y herramientas
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = Darwin
+          test "$(uname -m)" = arm64
+          mkdir -p dist/evidence
+          { sw_vers; uname -m; xcodebuild -version; swift --version; } | tee dist/evidence/toolchain.txt
+          python3 -m venv "$RUNNER_TEMP/dilo-venv"
+          "$RUNNER_TEMP/dilo-venv/bin/python" -m pip install 'Pillow==11.3.0'
+      - name: Probar lógica Swift y seguridad de scripts
+        run: |
+          set -euo pipefail
+          ./scripts/selftest.sh | tee dist/evidence/selftest.txt
+          "$RUNNER_TEMP/dilo-venv/bin/python" -m unittest discover -s Tests -p 'test_*.py' -v 2>&1 | tee dist/evidence/tests.txt
+      - name: Descargar modelo fijado y comprobar hashes
+        run: |
+          set -euo pipefail
+          python3 scripts/download-model.py "$RUNNER_TEMP/ParakeetV3" | tee dist/evidence/model-download.json
+      - name: Compilar y firmar app ad hoc con modelo y recursos
+        env:
+          SIGN_IDENTITY: '-'
+        run: |
+          set -euo pipefail
+          DILO_MODEL_DIR="$RUNNER_TEMP/ParakeetV3" ./scripts/build.sh 2>&1 | tee dist/evidence/build.txt
+          python3 scripts/verify-runtime.py dist/Dilo.app | tee dist/evidence/runtime.json
+          cp Package.resolved dist/evidence/Package.resolved
+      - name: Probar Core ML desde copia separada sin caché
+        run: |
+          set -euo pipefail
+          BIN_PATH="$(swift build -c release --show-bin-path)"
+          SMOKE="$(mktemp -d "$RUNNER_TEMP/dilo-offline.XXXXXX")"
+          ditto dist/Dilo.app "$SMOKE/Dilo.app"
+          cp "$BIN_PATH/DiloModelCheck" "$SMOKE/DiloModelCheck"
+          shopt -s nullglob
+          for resource in "$BIN_PATH"/*.bundle; do cp -R "$resource" "$SMOKE/"; done
+          mkdir -p "$SMOKE/home"
+          # El helper usa exclusivamente loadLocal; no resuelve ni descarga modelos.
+          (cd "$SMOKE" && HOME="$SMOKE/home" ./DiloModelCheck "$SMOKE/Dilo.app/Contents/Resources/ParakeetV3") | tee dist/evidence/coreml-smoke.txt
+      - name: Empaquetar y volver a verificar archivo extraído
+        run: |
+          set -euo pipefail
+          ./scripts/package-app.sh | tee dist/evidence/package.txt
+      - name: Subir app y evidencia (no crea Release)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Dilo-v0.1.1-macos-arm64-${{ github.sha }}
+          path: |
+            dist/Dilo-v0.1.1-macos-arm64.zip
+            dist/Dilo-v0.1.1-macos-arm64.zip.sha256
+            dist/LEEME-DILO-APP.txt
+            dist/evidence/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+      - name: Conservar diagnóstico si falla
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Dilo-diagnostico-${{ github.sha }}
+          path: dist/evidence/
+          if-no-files-found: warn
+          retention-days: 7

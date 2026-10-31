@@ -1,0 +1,46 @@
+DILO 0.1.1 — PAQUETE DE APP PARA MAC APPLE SILICON
+
+Este archivo acompaña al artefacto binario generado por GitHub Actions.
+No convierte el ZIP de fuentes en una aplicación y no acredita que ya exista una compilación.
+
+REQUISITOS
+- Mac Apple Silicon (M1/M2/M3/M4 o posterior), macOS 14 o posterior.
+- No necesitas Xcode, Swift, Homebrew ni descargar el modelo para el dictado.
+- El modelo Parakeet v3 y los recursos de FluidAudio van dentro de Dilo.app.
+- El pulido es opcional: requiere instalar codex e iniciar tu propia sesión
+  ChatGPT. No se incluye codex, una sesión ni una suscripción. Puedes apagarlo
+  en Ajustes y dictar localmente sin esa dependencia ni conexión a Internet.
+
+INSTALAR
+1. Descarga el artefacto cuyo commit coincida con la ejecución de Actions verde.
+2. Extrae el ZIP del artefacto y luego Dilo-v0.1.1-macos-arm64.zip.
+3. Cierra Dilo/Dictado desde su menú antes de actualizar. No borres tu app previa:
+   consérvala con otro nombre o en una carpeta de respaldo.
+4. Copia Dilo.app a Aplicaciones de tu usuario (~/Applications).
+5. Abre solo esa copia. No uses Actualizar Dilo.command: ese asistente compila fuentes.
+
+FIRMA Y GATEKEEPER
+La firma es ad hoc, sin Developer ID y sin notarización de Apple. No garantiza
+que macOS permita abrir una descarga de Internet ni conserva necesariamente
+los permisos previos. No se proporcionó certificado Apple para esta entrega.
+Si el aviso es solo desarrollador no identificado o no verificable y reconoces
+el paquete, revisa Ajustes del Sistema → Privacidad y seguridad → Abrir igualmente,
+solo si macOS ofrece esa opción para este archivo. Si advierte malware,
+«dañará tu ordenador» o archivo dañado, detente: no lo abras ni eludas el aviso.
+No desactives Gatekeeper ni las protecciones del sistema; guarda una captura.
+
+PERMISOS Y PRUEBA EN TU MAC
+Concede Micrófono, Accesibilidad y Monitoreo de entrada a la copia actual de Dilo.
+La primera carga de Core ML puede tardar en preparar los pesos para tu Mac.
+Apaga Pulir con ChatGPT y prueba dictar una frase con Option derecha en Notas.
+Verifica la tecla, el texto, el portapapeles y luego el pulido si lo usas.
+Que Actions compile, firme y procese silencio no prueba estos permisos, tu
+micrófono, el pegado ni tu sesión ChatGPT. Se necesita la prueba en tu Mac.
+Para permisos atascados, consulta LEEME CHRISTIAN.txt del paquete de fuentes.
+
+MODELO Y LICENCIAS
+NVIDIA Parakeet TDT 0.6B v3, licencia CC-BY-4.0; conversión Core ML de FluidInference.
+https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v3-coreml
+Se redistribuyen los pesos Core ML sin modificación; Dilo añade el cargador.
+Licencias, atribución y revisión exacta están dentro de Contents/Resources.

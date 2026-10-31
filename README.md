@@ -1,4 +1,4 @@
-# Dictado Mac
+# Dilo
 
 Dictado por voz para macOS, parecido a Wispr Flow, pero **la transcripción se hace 100 % en tu Mac**.
 Mantienes una tecla, hablas, la sueltas y el texto aparece donde tengas el cursor (Notas, Mail, el navegador, lo que sea).
@@ -7,7 +7,9 @@ Mantienes una tecla, hablas, la sueltas y el texto aparece donde tengas el curso
 - **Pulido opcional:** el texto transcrito se corrige (puntuación, mayúsculas, muletillas) con **ChatGPT**, usando el programa `codex` con tu sesión «Sign in with ChatGPT». No se usa ninguna API key de pago. **Solo viaja el texto, nunca el audio.** Se puede apagar con un interruptor y, si `codex` falla o tarda demasiado, se inserta el texto sin pulir.
 - **Tecla configurable:** desde Ajustes eliges qué tecla usar (incluso un modificador solo, como Option derecha, que es el valor inicial).
 
-> Estado: **primera versión, escrita sin poder compilarla** (se desarrolló en un servidor Linux). Es muy probable que la primera compilación necesite algún retoque pequeño. Mira la sección «Qué no se ha probado».
+> Actualización 0.1.1: nombre **Dilo** e icono de la imagen proporcionada. El usuario probó la app original en su Mac; **esta actualización no se ha compilado ni ejecutado en macOS**. Para actualizar con doble clic, abre **LEEME CHRISTIAN.txt** en TextEdit. Evidencia y límites: **VERIFICACION.md**.
+
+> Compilación binaria en GitHub Actions: lee **BUILD_GITHUB.md**. El repositorio y la identidad de publicación están autorizados; la entrega exige una ejecución verde y un ZIP descargado y verificado. El ZIP de fuentes no es una app. No se crea un Release público.
 
 ## Requisitos
 
@@ -25,13 +27,15 @@ Si no quieres el pulido, no necesitas `codex`: apágalo en Ajustes y la app dict
 En la Terminal, dentro de esta carpeta:
 
 ```bash
-./scripts/build.sh     # compila y crea dist/Dictado.app (firma ad-hoc, para uso personal)
+./scripts/build.sh     # compila y crea dist/Dilo.app (firma ad-hoc, para uso personal)
 ./scripts/run.sh       # abre la app
 ```
 
-La primera compilación tarda unos minutos (descarga FluidAudio). Para dejarla instalada: `INSTALL=1 ./scripts/build.sh` copia la app a `/Applications`.
+La primera compilación tarda unos minutos (descarga FluidAudio). Para dejarla instalada: `INSTALL=1 ./scripts/build.sh` instala en `~/Applications/Dilo.app`, sin sudo, guardando cualquier Dilo previa de este proyecto en una carpeta de respaldo y sin borrar Dictado. Antes de instalar, cierra la app desde su menú → Salir.
 
-Si macOS dice que no puede verificar la app: clic derecho sobre `Dictado.app` → *Abrir*, o ejecuta `xattr -dr com.apple.quarantine dist/Dictado.app` (no suele hacer falta porque la compilas tú).
+Si macOS bloquea un `.command` o `Dilo.app`, lee el aviso. Si solo indica **desarrollador no identificado** o que no puede verificar al desarrollador, y reconoces este paquete, puedes usar **Ajustes del Sistema → Privacidad y seguridad → Abrir igualmente**, si se ofrece para ese archivo. Ante una advertencia de **malware**, «dañará tu ordenador» o archivo dañado, **detente, no lo abras ni eludas el aviso**: guarda una captura y pide ayuda. No desactives las protecciones del sistema.
+
+Si Terminal solicita acceso a **Descargas** o a la carpeta del paquete, permítelo solo si corresponde a la carpeta que estás usando. Si lo denegaste, revisa **Privacidad y seguridad → Archivos y carpetas → Terminal**, si aparece, y reabre el actualizador. No hace falta **Acceso total al disco**. Para otros fallos de lectura/ejecución, consulta **LEEME CHRISTIAN.txt** o pide ayuda.
 
 ## Primera vez: permisos
 
@@ -43,9 +47,11 @@ Al abrir por primera vez aparece la ventana de **Ajustes** y macOS pide el micr�
 | **Accesibilidad** | Pegar el texto (envía ⌘V) | Accesibilidad |
 | **Monitoreo de entrada** | Detectar la tecla de dictado en cualquier app | Monitoreo de entrada |
 
-En la sección *Permisos* de Ajustes cada fila tiene un botón **Conceder…** que abre el panel correcto. Activa el interruptor de «Dictado» en cada lista. La app comprueba los permisos cada pocos segundos: en cuanto los concedes, la tecla empieza a funcionar sin reiniciar. Mientras falte alguno, el icono de la barra de menú es un micrófono tachado.
+En la sección *Permisos* de Ajustes aparece **Conceder…** cuando la app detecta un permiso pendiente; solicita el permiso o abre su panel. Activa «Dilo» en cada lista (puede figurar como «Dictado»). La app consulta los estados y reintenta activar la tecla, pero no garantiza que baste sin cerrar y abrir. Si macOS lo solicita, sal de Dilo y abre solo la copia actual. El micrófono tachado indica que la tecla no está activa.
 
-> **Ojo:** como la app va firmada ad-hoc, cada vez que la recompilas macOS la ve como «otra app» y puede ignorar los permisos anteriores. Si tras recompilar deja de funcionar: en esas listas selecciona «Dictado», pulsa **−**, y vuelve a añadirla (o a activarla). Para evitarlo puedes firmar con un certificado propio de «Acceso a Llaveros → Asistente de Certificados → Crear un certificado…» (tipo *Firma de código*): `SIGN_IDENTITY="Nombre del certificado" ./scripts/build.sh`.
+> **Ojo:** una compilación con firma ad hoc puede hacer que macOS deje de reconocer permisos anteriores o los pida de nuevo, aunque conservemos `local.dictado.DictadoMac`; no ocurre necesariamente en todos los casos. No se restablecen permisos automáticamente. Puedes usar una identidad de firma propia mediante `SIGN_IDENTITY="Nombre del certificado" ./scripts/build.sh`; este paquete no proporciona un certificado ni garantiza conservar TCC.
+
+**Si figuran activos pero no funcionan:** sal de Dilo y de cualquier Dictado abierto. En **Privacidad y seguridad → Accesibilidad**, selecciona su entrada y quítala con **−**, si existe; **quitar una entrada de privacidad no elimina la app, ajustes ni archivos**. Añade con **+** la copia actual en **tu carpeta de usuario → Aplicaciones → Dilo** (`~/Applications/Dilo.app`) y actívala. Repite en **Monitoreo de entrada** si ofrece esos botones. En **Micrófono**, o sin **−/+**, desactiva y activa el permiso si es posible; vuelve a abrir Dilo y usa **Conceder…** si aparece. No elijas Dictado ni una copia de respaldo. Esto puede ayudar, pero **no garantiza resolver el fallo**: si persiste, guarda una captura y solicita diagnóstico sin borrar apps. Pasos completos: **LEEME CHRISTIAN.txt**.
 
 ## Elegir la tecla de dictado
 
@@ -108,7 +114,7 @@ con el prompt por entrada estándar (no en la lista de procesos). Detalles:
 |---|---|
 | `swift build` dice que la versión de herramientas no es compatible | Actualiza Xcode / Command Line Tools (necesitas Swift 6.0+): `softwareupdate` o `xcode-select --install`. |
 | Falla al resolver paquetes | Hace falta internet (FluidAudio y un componente binario se descargan de GitHub). Reintenta. |
-| Icono de micrófono tachado / la tecla no hace nada | Faltan permisos. Abre Ajustes → *Permisos*. Tras recompilar, quita y vuelve a añadir «Dictado» en Accesibilidad y Monitoreo de entrada. |
+| Icono de micrófono tachado / la tecla no hace nada | Revisa Ajustes → *Permisos*. Si figuran activos pero fallan, sigue la reconcesión manual en **LEEME CHRISTIAN.txt**; puede no bastar. Si persiste, solicita diagnóstico sin borrar la app. |
 | Al dictar dice «El modelo de voz aún no está listo» | Espera: se está descargando o preparando (la primera vez tarda). Si da error, «Reintentar» en Ajustes → General. |
 | No se pega, el texto queda en el portapapeles | Falta el permiso de Accesibilidad. Pega con ⌘V. También ocurre en campos de contraseña o con «Secure Keyboard Entry» activo en la Terminal. |
 | El pegado devuelve el portapapeles viejo demasiado pronto en alguna app | Algunas apps leen el portapapeles tarde. Sube `restoreDelay` en `Sources/DictadoMac/TextInserter.swift` (300 ms) y recompila. |
@@ -121,7 +127,7 @@ con el prompt por entrada estándar (no en la lista de procesos). Detalles:
 
 ## Qué no se ha probado
 
-Esta versión se escribió y revisó sin acceso a un Mac: **no se ha compilado ni ejecutado**. Se verificó solo que el código es sintácticamente válido (analizador de Swift 6.1) y la lógica independiente de Apple (`./scripts/selftest.sh`). Lo que hay que comprobar en el Mac:
+La app original fue probada por el usuario en su Mac, con el pulido ChatGPT apagado. Eso no valida este nuevo paquete. **La actualización Dilo no se ha compilado ni ejecutado en macOS**. En este entorno Linux no hay Swift; `scripts/selftest.sh` no puede ejecutarse aquí. Las verificaciones realmente ejecutadas, los resultados y las pruebas pendientes están en `VERIFICACION.md`. Lo que hay que comprobar en el Mac:
 
 **Qué probar primero:** que compila; que el modelo se descarga y carga; que la tecla se detecta con los permisos; que el pegado funciona en Notas, el navegador y un editor; que `codex exec` con tu sesión devuelve el texto pulido; el comportamiento de respaldo (apagar wifi con el pulido activo); cambiar de tecla en Ajustes; elegir otro micrófono.
 
@@ -151,7 +157,7 @@ Sources/DictadoMac/
   SettingsView.swift           Ventana de Ajustes (SwiftUI)
 Resources/Info.plist           LSUIElement, descripción del micrófono
 Resources/DictadoMac.entitlements
-scripts/build.sh               Compila, monta Dictado.app y firma ad-hoc
+scripts/build.sh               Compila, monta Dilo.app y firma ad-hoc
 scripts/run.sh                 Abre la app (--logs para ver registros)
 scripts/selftest.sh            Pruebas de la lógica sin AppKit (también corren en Linux)
 SelfTests/main.swift

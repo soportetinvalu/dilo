@@ -1,0 +1,25 @@
+{
+  "base_commit": "274904a1756ae31d69b6ff271660772cbf9e37a5",
+  "files": {
+    "Package.swift": "c9e151de85744b9efc8ae70bdde7e26c83785fa8f28692b5d0f68ca4bf9aae13",
+    "Resources/DictadoMac.entitlements": "661d3ece31714f3a59c2785820bedd57189e0f0180ec82a32ce695682c1ac061",
+    "SelfTests/main.swift": "f4a418f284d41e480c58c8953d26afa429851b1e87392de66f24ffbecf256d64",
+    "Sources/DictadoMac/AppDelegate.swift": "25ed616a2945f21029527055bdfe3cea13bba67a5938e4518660778c95cff47e",
+    "Sources/DictadoMac/AppSettings.swift": "350d60ec930e7c6566abef1ce97835289bdefc24c0a9e79bb9b60c453f39e044",
+    "Sources/DictadoMac/AudioDevices.swift": "a958e3b1761eef35e5477dc5e2e81f6844f095da0a4a101a11fdbe864e40cd6a",
+    "Sources/DictadoMac/AudioRecorder.swift": "cd48c89b232267782112b2a9aaff453df7017837c6b1cc375d7bf85847c60ee4",
+    "Sources/DictadoMac/DictadoMacApp.swift": "211296cf3c1e873ecf394eb69337edbb0e88689c94b70c24e0919a9afafd1985",
+    "Sources/DictadoMac/DictationController.swift": "5f1847ca2a3d173a82be42331ffcf3ba4d7c01e42ee3d2397cd6449f0a79c08b",
+    "Sources/DictadoMac/HotkeyBinding.swift": "e8c387e0168b0315ff1a7efeae1dc7894ea7bacfd0913db371fc6f0c5685aec0",
+    "Sources/DictadoMac/HotkeyManager.swift": "2644ad495c83920679109eccb52be9bd6c52c561f93d538ae69ca65c5f203734",
+    "Sources/DictadoMac/OverlayPanel.swift": "f5ccb5134b033789499fffa9feff1cec49ce7e867c53f68422abfd239317630e",
+    "Sources/DictadoMac/ParakeetTranscriber.swift": "604e630eddee45bd1877646c2cb62b83af22017efaec3d23453cf999a640b6c9",
+    "Sources/DictadoMac/Permissions.swift": "73488aa49cd60ea1185ddc23ebe08a527574d4d650d8696b3404e6fb02617b6b",
+    "Sources/DictadoMac/PolishPrompt.swift": "30f3becd1942173a991440bdfac9f66eaa8ed470a740d8bc08db086166a7b406",
+    "Sources/DictadoMac/ProcessRunner.swift": "e8aa8df606352390f3e5ef56a7fae5ae3e65b21ccafb83e6cfb5d830533ceff3",
+    "Sources/DictadoMac/SettingsView.swift": "2182e868118dae90e751fb6126f8baea09c350ef7bf3d826780733226dff7ebe",
+    "Sources/DictadoMac/ShortcutRecorderView.swift": "edeb47d63d473101b71fa3fceb8547e2d2915a81e0f4ef28e1ae166a33d441dd",
+    "Sources/DictadoMac/TextInserter.swift": "da0dbd8116a884a87979094bf1c5c4fe168632186d1d8426405df9aa8aa81b00",
+    "Sources/DictadoMac/TextPolisher.swift": "f6ea80c5aacedb1fb71429f8cc67eb568469ef4c48d9384a438cb55830307baf"
+  }
+}

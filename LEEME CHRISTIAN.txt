@@ -1,0 +1,121 @@
+DILO — PARA CHRISTIAN
+
+Esta es la actualización de Dictado a Dilo, con tu imagen como icono.
+Es un paquete fuente, no una app ya compilada. Se prepara en tu propio Mac.
+Esta actualización no se ha compilado ni probado en macOS. Las comprobaciones
+realizadas en Linux y sus límites se explican en VERIFICACION.md.
+
+CÓMO ACTUALIZAR
+
+1. Descomprime el ZIP y entra en la carpeta Dilo. No saques archivos sueltos.
+2. En el micrófono de la barra superior, elige Salir de Dictado o Salir de Dilo.
+3. Abre Actualizar Dilo.command con doble clic y pulsa Continuar.
+   Se abrirá Terminal automáticamente: no tienes que escribir comandos.
+   Deja esa ventana abierta hasta que termine. La primera compilación puede
+   tardar varios minutos y necesita internet.
+4. Si macOS pregunta si Terminal puede acceder a Descargas (o a la carpeta
+   donde guardaste este paquete), permite ese acceso solo si corresponde
+   a la carpeta que estás usando. No hace falta dar Acceso total al disco.
+   Si lo rechazaste, revisa Ajustes del Sistema → Privacidad y seguridad →
+   Archivos y carpetas → Terminal y permite esa carpeta, si aparece. Después
+   vuelve a abrir el actualizador. Si no aparece o sigue fallando, pide ayuda.
+5. Dilo se abrirá al terminar. Seguirás viendo un micrófono en la barra superior.
+   La app queda en tu carpeta de usuario → Aplicaciones → Dilo
+   (~/Applications/Dilo.app), no en la carpeta Aplicaciones general del Mac.
+
+Si faltan herramientas de Apple, abre Instalar herramientas.command,
+acepta el instalador oficial, espera a que termine y repite el paso 3.
+Se necesita un Mac Apple Silicon, macOS 14+ y Swift 6+ (Xcode 16 o posterior).
+Si ya hay herramientas antiguas, actualízalas desde Ajustes del Sistema →
+General → Actualización de software; el asistente no las actualiza por sí solo.
+Si usas Terminal bajo Rosetta, vuelve a abrirla sin «Abrir usando Rosetta».
+
+SI MACOS BLOQUEA UN ARCHIVO .COMMAND O LA APP
+
+Lee el mensaje antes de continuar; no todos los bloqueos son iguales.
+- Si solo dice «desarrollador no identificado» o que no puede verificar al
+  desarrollador, y reconoces este paquete que has solicitado, revisa Ajustes
+  del Sistema → Privacidad y seguridad. Puedes usar Abrir igualmente para ese
+  archivo si macOS ofrece esa opción, y confirmar su apertura.
+- Si advierte de malware, dice que «dañará tu ordenador» o que el archivo está
+  dañado, detente: no lo abras ni intentes eludir el aviso. Guarda una captura
+  y pide ayuda. No uses Abrir igualmente para una advertencia de malware.
+- Si dice que faltan permisos de lectura/ejecución, revisa el acceso a la carpeta
+  explicado arriba. Si no se resuelve o el bloqueo es distinto, guarda una
+  captura y pide ayuda; no cambies permisos de todo el disco.
+No desactives Gatekeeper ni otras protecciones de macOS. No necesitas comandos
+para quitar advertencias ni para restablecer permisos.
+
+AL ABRIR DILO
+
+Tus ajustes se conservan mediante el mismo identificador de aplicación.
+Comprueba que Pulir con ChatGPT sigue apagado, como lo tenías. El actualizador
+no activa ni desactiva esa opción ni inicia sesión en ningún servicio.
+La firma es local (ad hoc): una nueva compilación puede hacer que macOS deje
+de reconocer permisos anteriores o vuelva a pedirlos. No ocurre necesariamente
+en todos los Mac ni se garantiza conservarlos por mantener el identificador.
+Abre el menú del micrófono → Ajustes → Permisos. Revisa Micrófono, Accesibilidad
+(para pegar) y Monitoreo de entrada (para leer la tecla). En cada apartado de
+Ajustes del Sistema → Privacidad y seguridad activa Dilo si corresponde.
+Puede aparecer el nombre anterior, Dictado. Si macOS pide cerrar y volver a
+abrir la app para aplicar un permiso, hazlo; abre solo la copia nueva de Dilo.
+
+SI LOS PERMISOS FIGURAN ACTIVOS PERO NO FUNCIONAN
+
+Puedes intentar volver a concederlos manualmente, sin borrar aplicaciones:
+1. Sal de Dilo desde el micrófono → Salir de Dilo. Cierra también Dictado si
+   sigue abierto; no ejecutes las dos copias a la vez.
+2. Ve a Ajustes del Sistema → Privacidad y seguridad → Accesibilidad.
+   Selecciona la entrada de Dilo (o la de Dictado que corresponda a esta app)
+   y pulsa el botón − si está disponible. Quitar una entrada de privacidad
+   no elimina la app, tus ajustes ni tus archivos: solo retira esa autorización.
+3. Si aparece el botón +, añade la copia actual de Dilo desde tu carpeta de
+   usuario → Aplicaciones → Dilo (~/Applications/Dilo.app) y actívala.
+   No elijas Dictado.app ni una copia de respaldo. Repite los pasos 2 y 3 en
+   Monitoreo de entrada si ese panel ofrece esos botones.
+4. En Micrófono, o si el panel no ofrece −/+, desactiva y vuelve a activar
+   el permiso de Dilo si está disponible. Abre Dilo de nuevo; desde Ajustes →
+   Permisos usa Conceder… si aparece y acepta la solicitud del sistema.
+   Si macOS exige otro cierre y apertura, sigue esa indicación.
+5. Prueba una frase en una nota vacía. Esto puede ayudar, pero quitar y añadir
+   una entrada no siempre basta. Si sigue sin responder o entra en un bucle,
+   no repitas cambios a ciegas: guarda una captura del aviso y de los estados
+   de permisos, e indica qué copia abriste para solicitar ayuda.
+La app y el actualizador no restablecen ni cambian permisos automáticamente;
+solo consultan su estado y ofrecen las solicitudes oficiales del sistema.
+No borres Dilo, Dictado ni tus archivos para intentar resolverlo.
+
+ICONO Y PRUEBA RÁPIDA (CON CHATGPT APAGADO)
+
+El icono con tu imagen aparece en Finder y los diálogos del sistema.
+No aparece permanentemente en el Dock: sigue siendo una app de barra de menú.
+El micrófono de esa barra cambia con el estado, igual que antes.
+
+1. Abre Notas y coloca el cursor en una nota vacía.
+2. Espera a que Dilo indique que está listo. Usa la misma tecla de dictado de antes.
+3. Di «Hola Christian, esta es una prueba de Dilo» y suelta la tecla si usas
+   el modo Mantener pulsada; en el modo de dos pulsaciones, pulsa para terminar.
+4. Comprueba que el texto aparece. Prueba también el navegador o el editor habitual.
+
+TUS COPIAS Y CÓMO VOLVER ATRÁS
+
+- No se borra ni sustituye Dictado.app, esté donde esté.
+- Si ya existía una Dilo de este proyecto en tu carpeta Aplicaciones de usuario,
+  se mueve completa a Dilo-respaldo.XXXXXX/Dilo.app en esa misma carpeta.
+  La ventana del actualizador muestra la ruta exacta. Una Dilo de otro proyecto
+  no se sustituye.
+- Si algo falla, la ventana muestra el error y conserva los archivos. Una
+  compilación fallida no toca tu app instalada. No hace falta borrar carpetas.
+- Para volver: sal de Dilo desde el micrófono y abre tu Dictado.app original
+  desde su ubicación anterior, o la Dilo.app dentro de la carpeta de respaldo.
+  No abras dos copias a la vez: pueden compartir ajustes y seguir necesitando
+  permisos. El cambio de copia tampoco garantiza conservarlos.
+- Si Dictado se abre automáticamente al iniciar sesión, esa entrada no se cambia.
+  Cuando hayas comprobado Dilo, revisa General → Ítems de inicio para no iniciar
+  ambas. Este paquete no añade ni elimina entradas de inicio.
+
+Las carpetas ocultas .Dilo-nueva.* y dist/.dilo-build.* son copias de preparación
+conservadas por seguridad, no archivos personales. No necesitas tocarlas.
+
+No se incluye Developer ID, notarización ni instalador binario. No se necesita
+codex, Homebrew, Node ni una clave API para usar el dictado sin pulido.

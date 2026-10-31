@@ -79,7 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         guard let button = statusItem.button,
-              var image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Dictado")
+              var image = NSImage(systemSymbolName: symbol, accessibilityDescription: "Dilo")
         else { return }
         if let color,
            let tinted = image.withSymbolConfiguration(NSImage.SymbolConfiguration(paletteColors: [color])) {
@@ -122,7 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let recheck = NSMenuItem(title: "Comprobar codex de nuevo", action: #selector(recheckCodex), keyEquivalent: "")
         recheck.target = self
         menu.addItem(recheck)
-        let quit = NSMenuItem(title: "Salir de Dictado", action: #selector(quitApp), keyEquivalent: "q")
+        let quit = NSMenuItem(title: "Salir de Dilo", action: #selector(quitApp), keyEquivalent: "q")
         quit.target = self
         menu.addItem(quit)
     }
@@ -163,7 +163,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if settingsWindow == nil {
             let view = SettingsView(settings: settings, transcriber: transcriber, polisher: polisher, hotkeys: hotkeys)
             let window = NSWindow(contentViewController: NSHostingController(rootView: view))
-            window.title = "Dictado — Ajustes"
+            window.title = "Dilo — Ajustes"
             window.styleMask = [.titled, .closable, .miniaturizable]
             window.isReleasedWhenClosed = false
             window.center()

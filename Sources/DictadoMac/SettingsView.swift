@@ -41,7 +41,7 @@ struct SettingsView: View {
             }
 
             if !hotkeys.isActive {
-                Text("La tecla todavía no funciona: faltan permisos (mira «Permisos» más abajo). Se activará sola al concederlos.")
+                Text("La tecla no está activa. Revisa «Permisos» más abajo; si sigue sin responder tras concederlos, consulta LEEME CHRISTIAN.txt.")
                     .font(.caption)
                     .foregroundStyle(.red)
             }
@@ -147,7 +147,7 @@ struct SettingsView: View {
                     Permissions.openSystemSettings(.inputMonitoring)
                 }
             )
-            Text("Activa «Dictado» en cada lista de Ajustes del Sistema → Privacidad y seguridad. Si acabas de recompilar la app y deja de funcionar, quita «Dictado» de la lista (botón −) y vuelve a añadirla.")
+            Text("Activa «Dilo» en Privacidad y seguridad. Si los permisos figuran activos pero no funcionan, sal de Dilo y, si el panel ofrece −/+, quita solo su entrada y añade la copia actual desde tu carpeta de usuario → Aplicaciones → Dilo. Quitar la entrada no elimina la app ni tus ajustes. En Micrófono, o sin −/+, desactiva y activa el permiso si es posible; vuelve a abrir Dilo y concédelo si se solicita. Consulta LEEME CHRISTIAN.txt para los pasos. No se restablecen permisos automáticamente y volver a concederlos no garantiza resolver el fallo.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

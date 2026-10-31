@@ -52,7 +52,7 @@ final class ParakeetTranscriber: ObservableObject {
         state = .downloading(0)
         do {
             // v3 = multilingüe (25 idiomas, incluido español, con puntuación y mayúsculas).
-            let models = try await AsrModels.downloadAndLoad(
+            let models = try await AsrModels.diloLoad(
                 version: .v3,
                 progressHandler: { [weak self] progress in
                     let fraction = progress.fractionCompleted

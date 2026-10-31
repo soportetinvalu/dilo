@@ -1,7 +1,7 @@
 // swift-tools-version: 5.9
 import PackageDescription
 
-// Dictado Mac — dictado por voz local para macOS (Apple Silicon).
+// Dilo — dictado por voz local para macOS (Apple Silicon).
 // Un solo ejecutable de Swift Package; scripts/build.sh lo empaqueta como .app.
 let package = Package(
     name: "DictadoMac",
@@ -18,6 +18,11 @@ let package = Package(
                 .product(name: "FluidAudio", package: "FluidAudio"),
             ],
             path: "Sources/DictadoMac"
+        ),
+        .executableTarget(
+            name: "DiloModelCheck",
+            dependencies: [.product(name: "FluidAudio", package: "FluidAudio")],
+            path: "Tools/DiloModelCheck"
         ),
     ]
 )
