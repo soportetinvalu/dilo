@@ -1,5 +1,10 @@
 # Compilación y entrega binaria mediante GitHub Actions
 
+> Esta página conserva la entrega histórica con encoder v2. La restauración
+> del encoder original, su lock y comparación se documentan en
+> [RESTAURACION_ENCODER.md](RESTAURACION_ENCODER.md). No reutilices los hashes
+> históricos para la nueva compilación.
+
 ## Estado de publicación
 
 Repositorio autorizado: https://github.com/soportetinvalu/dilo (público).

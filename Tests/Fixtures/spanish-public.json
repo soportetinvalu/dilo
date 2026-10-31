@@ -1,0 +1,43 @@
+{
+  "dataset": "PolyAI/minds14",
+  "revision": "40ce77cb32a384e4d50a568e1ec39ac804019d33",
+  "config": "es-ES",
+  "split": "train",
+  "license": "CC-BY-4.0",
+  "transformation": "ffmpeg: mu-law WAV a PCM16 mono 16 kHz; sin recortes ni cambios al texto de referencia",
+  "samples": [
+    {
+      "path": "minds14-es-0.wav",
+      "source_path": "es-ES~APP_ERROR/60266571dc3604f481bcb50a.wav",
+      "row": 0,
+      "source_sha256": "8a350c47afd69d9fc7f01f6a7bdfa4ccec3515e2d0bdef218e7e2c17468f99b4",
+      "sha256": "afe1acb70c4c2388a310873412fec688553354f405b399524a5bd583a9292918",
+      "size": 546176,
+      "seconds": 17.066625,
+      "sample_rate": 16000,
+      "reference": "hola buenas a ver tengo un problema con vuestra aplicación resulta que quiero hacer una transferencia bancaria a una cuenta conocida"
+    },
+    {
+      "path": "minds14-es-1.wav",
+      "source_path": "es-ES~APP_ERROR/6026655bdc3604f481bcb4fa.wav",
+      "row": 1,
+      "source_sha256": "59fae3df6b9164803df0534ac284ded32deb7b09d4f9b83d838ed8941c04ccfc",
+      "sha256": "eabe6fd789a83cdc9e12b810504d4e7aa945e876214e7441c6951348661ba6a8",
+      "size": 131116,
+      "seconds": 4.096,
+      "sample_rate": 16000,
+      "reference": "la aplicación no cargue el saldo de mi nueva cuenta"
+    },
+    {
+      "path": "minds14-es-2.wav",
+      "source_path": "es-ES~APP_ERROR/6026655cdc3604f481bcb4fb.wav",
+      "row": 2,
+      "source_sha256": "3afb9231cc43b9ffd87766c41b1dfb9a33eac7bb93c80ad3db82edad83572626",
+      "sha256": "5b7b8c13147f63fb9ff9e20c88c2485353e14655a00dc6f4c6035bbdbdced1e8",
+      "size": 483372,
+      "seconds": 15.104,
+      "sample_rate": 16000,
+      "reference": "hola tengo un problema con la aplicación no carga y tampoco voy a quitar Gael saldo de mi cuenta nueva dice que la aplicación está siendo reparada y ahora no puedo acceder a mi cuenta necesito inmediatamente"
+    }
+  ]
+}

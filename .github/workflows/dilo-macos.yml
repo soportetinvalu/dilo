@@ -3,7 +3,7 @@ name: Dilo macOS Apple Silicon
 on:
   workflow_dispatch:
   push:
-    branches: [main, 'feat/**', 'ci/**']
+    branches: [main, 'feat/**', 'ci/**', 'fix/**']
     paths-ignore: ['**.md', '**.txt']
   pull_request:
     branches: [main]
@@ -67,6 +67,11 @@ jobs:
           mkdir -p "$SMOKE/home"
           # El helper usa exclusivamente loadLocal; no resuelve ni descarga modelos.
           (cd "$SMOKE" && HOME="$SMOKE/home" ./DiloModelCheck "$SMOKE/Dilo.app/Contents/Resources/ParakeetV3") 2>&1 | tee dist/evidence/coreml-smoke.txt
+      - name: Comparar voz española pública sin pulido (int8 frente a int8V2)
+        run: |
+          set -euo pipefail
+          BIN_PATH="$(swift build -c release --show-bin-path)"
+          python3 scripts/compare-public-speech.py "$BIN_PATH/DiloModelCheck" "$RUNNER_TEMP/ParakeetV3" "$RUNNER_TEMP/dilo-speech-comparison" "$PWD/dist/evidence/spanish-comparison.json" 2>&1 | tee dist/evidence/spanish-comparison.txt
       - name: Empaquetar y volver a verificar archivo extraído
         run: |
           set -euo pipefail

@@ -21,10 +21,34 @@ def module(name, path):
 class ModelIntegrity(unittest.TestCase):
     def test_app_and_smoke_select_the_packaged_encoder_variant(self):
         lock = json.loads((ROOT / "Resources/parakeet-v3.lock.json").read_text())
-        self.assertIn("Encoder_v2.mlmodelc", {x["path"].split("/")[0] for x in lock["files"]})
+        self.assertIn("Encoder.mlmodelc", {x["path"].split("/")[0] for x in lock["files"]})
         for source in ["Sources/DictadoMac/BundledParakeet.swift",
                        "Tools/DiloModelCheck/DiloModelCheck.swift"]:
-            self.assertIn("encoderPrecision: .int8V2", (ROOT / source).read_text())
+            self.assertRegex((ROOT / source).read_text(), r"encoderPrecision: \.int8[,)\s]")
+
+    def test_obsolete_encoder_is_rejected_without_deleting_it(self):
+        download = module("component_guard", "scripts/download-model.py")
+        lock = json.loads((ROOT / "Resources/parakeet-v3.lock.json").read_text())
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", str(ROOT / "Tests"))) as tmp:
+            directory = Path(tmp)
+            (directory / "Encoder.mlmodelc").mkdir()
+            download.validate_components(directory, lock)
+            (directory / "Encoder_v2.mlmodelc").mkdir()
+            with self.assertRaisesRegex(ValueError, "Encoder_v2"):
+                download.validate_components(directory, lock)
+            self.assertTrue((directory / "Encoder_v2.mlmodelc").is_dir())
+
+    def test_public_fixtures_and_wer_are_real_and_discriminate_errors(self):
+        compare = module("speech_comparison", "scripts/compare-public-speech.py")
+        _, fixture = compare.verified_fixtures()
+        exact = [dict(path=x["path"], text=x["reference"]) for x in fixture["samples"]]
+        self.assertEqual(compare.score(fixture["samples"], exact)["wer"], 0)
+        broken = [dict(path=x["path"], text="palabra equivocada") for x in fixture["samples"]]
+        self.assertGreater(compare.score(fixture["samples"], broken)["wer"], 0.65)
+        with self.assertRaises(ValueError):
+            compare.score(fixture["samples"], exact[:-1])
+        self.assertEqual(compare.distance(["a", "b", "c"], ["a", "d", "c", "e"]), 2)
+        self.assertNotEqual(compare.words("sí"), compare.words("si"))
 
     def test_verified_bytes_and_corruption_are_distinguished(self):
         download = module("dilo_download", "scripts/download-model.py")
@@ -60,7 +84,7 @@ class ModelIntegrity(unittest.TestCase):
         lock = json.loads((ROOT / "Resources/parakeet-v3.lock.json").read_text())
         self.assertRegex(lock["revision"], r"^[a-f0-9]{40}$")
         names = {x["path"].split("/")[0] for x in lock["files"]}
-        self.assertEqual(names, {"Encoder_v2.mlmodelc", "Decoder.mlmodelc",
+        self.assertEqual(names, {"Encoder.mlmodelc", "Decoder.mlmodelc",
                                  "JointDecisionv3.mlmodelc", "Preprocessor.mlmodelc",
                                  "parakeet_vocab.json", "README.md"})
         self.assertEqual(len(lock["files"]), len({x["path"] for x in lock["files"]}))

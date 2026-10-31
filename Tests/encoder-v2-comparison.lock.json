@@ -1,0 +1,27 @@
+{
+  "repo": "FluidInference/parakeet-tdt-0.6b-v3-coreml",
+  "revision": "7dd20fe6b1797d35f5e3307e8b1732d9a178edfe",
+  "license": "CC-BY-4.0",
+  "files": [
+    {
+      "path": "Encoder_v2.mlmodelc/analytics/coremldata.bin",
+      "size": 243,
+      "sha256": "af98d71151609799efbbffc00112fcba4bd91adf0b01135a982c574e91822f9c"
+    },
+    {
+      "path": "Encoder_v2.mlmodelc/coremldata.bin",
+      "size": 478,
+      "sha256": "70628bd4fd25fb554cc0cebc31356723930c885480132bf3ecd1b5dbe71dd0a2"
+    },
+    {
+      "path": "Encoder_v2.mlmodelc/model.mil",
+      "size": 1002653,
+      "git_blob_sha1": "af2fb4d2179bdff0eb165993269a8a40eeae6580"
+    },
+    {
+      "path": "Encoder_v2.mlmodelc/weights/weight.bin",
+      "size": 594211328,
+      "sha256": "8d2c79e15a4545e08fe3a21fe741e42b8bf24329db81de8fdfacd92388ea5a66"
+    }
+  ]
+}

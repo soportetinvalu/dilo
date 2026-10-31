@@ -53,6 +53,13 @@ def fetch_entry(directory, lock, entry, verify_only=False):
             time.sleep(2 ** attempt)
 
 
+def validate_components(directory, lock):
+    expected = {entry["path"].split("/")[0] for entry in lock["files"]}
+    unexpected = {path.name for path in directory.glob("*.mlmodelc")} - expected
+    if unexpected:
+        raise ValueError("Componentes Core ML no previstos: " + ", ".join(sorted(unexpected)))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
@@ -61,6 +68,7 @@ def main():
     lock = json.loads((ROOT / "Resources/parakeet-v3.lock.json").read_text())
     if not args.verify_only:
         args.directory.mkdir(parents=True, exist_ok=True)
+    validate_components(args.directory, lock)
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda entry: fetch_entry(args.directory, lock, entry, args.verify_only), lock["files"]))
     print(json.dumps({"repo": lock["repo"], "revision": lock["revision"],

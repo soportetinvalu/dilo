@@ -1,5 +1,10 @@
 # Dilo 0.1.1 — evidencia y límites de la entrega
 
+> Esta página conserva la entrega histórica con encoder v2. La restauración
+> del encoder original, su lock y comparación se documentan en
+> [RESTAURACION_ENCODER.md](RESTAURACION_ENCODER.md). No reutilices los hashes
+> históricos para la nueva compilación.
+
 ## Resultado binario verificado
 
 **Dilo.app compilada y empaquetada con su modelo local; ZIP descargado y comprobado.**

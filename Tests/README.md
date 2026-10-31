@@ -1,5 +1,10 @@
 # Pruebas de la entrega Dilo
 
+La restauración del encoder original y comparación real con tres fixtures públicas
+se describen en `../RESTAURACION_ENCODER.md` y `Fixtures/README.md`.
+Suite completa: `python3 -m unittest discover -s Tests -p 'test_*.py' -v`.
+La comparación Core ML se ejecuta en macOS CI; WER no prueba pulido ni micrófono.
+
 En Linux: `PYTHONDONTWRITEBYTECODE=1 python3 Tests/test_delivery.py`.
 Requiere Python 3 y Pillow; no son requisitos del actualizador en el Mac.
 

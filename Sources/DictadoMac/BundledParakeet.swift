@@ -13,9 +13,9 @@ extension AsrModels {
             if FileManager.default.fileExists(atPath: directory.path) {
                 // Si el paquete está incompleto, falla localmente: no oculta el error
                 // con una descarga ni necesita Internet para el dictado empaquetado.
-                return try loadLocal(from: directory, version: version, encoderPrecision: .int8V2)
+                return try loadLocal(from: directory, version: version, encoderPrecision: .int8)
             }
         }
-        return try await downloadAndLoad(version: version, progressHandler: progressHandler)
+        return try await downloadAndLoad(version: version, encoderPrecision: .int8, progressHandler: progressHandler)
     }
 }
