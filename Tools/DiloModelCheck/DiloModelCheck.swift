@@ -10,7 +10,8 @@ struct DiloModelCheck {
         }
         // loadLocal no resuelve repositorios ni descarga. No usa micrófono ni TCC.
         let models = try AsrModels.loadLocal(
-            from: URL(fileURLWithPath: CommandLine.arguments[1]), version: .v3)
+            from: URL(fileURLWithPath: CommandLine.arguments[1]), version: .v3,
+            encoderPrecision: .int8V2)
         let asr = AsrManager(config: .default)
         try await asr.loadModels(models)
         var state = TdtDecoderState.make(decoderLayers: await asr.decoderLayerCount)

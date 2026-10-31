@@ -66,7 +66,7 @@ jobs:
           for resource in "$BIN_PATH"/*.bundle; do cp -R "$resource" "$SMOKE/"; done
           mkdir -p "$SMOKE/home"
           # El helper usa exclusivamente loadLocal; no resuelve ni descarga modelos.
-          (cd "$SMOKE" && HOME="$SMOKE/home" ./DiloModelCheck "$SMOKE/Dilo.app/Contents/Resources/ParakeetV3") | tee dist/evidence/coreml-smoke.txt
+          (cd "$SMOKE" && HOME="$SMOKE/home" ./DiloModelCheck "$SMOKE/Dilo.app/Contents/Resources/ParakeetV3") 2>&1 | tee dist/evidence/coreml-smoke.txt
       - name: Empaquetar y volver a verificar archivo extraído
         run: |
           set -euo pipefail

@@ -19,6 +19,13 @@ def module(name, path):
 
 
 class ModelIntegrity(unittest.TestCase):
+    def test_app_and_smoke_select_the_packaged_encoder_variant(self):
+        lock = json.loads((ROOT / "Resources/parakeet-v3.lock.json").read_text())
+        self.assertIn("Encoder_v2.mlmodelc", {x["path"].split("/")[0] for x in lock["files"]})
+        for source in ["Sources/DictadoMac/BundledParakeet.swift",
+                       "Tools/DiloModelCheck/DiloModelCheck.swift"]:
+            self.assertIn("encoderPrecision: .int8V2", (ROOT / source).read_text())
+
     def test_verified_bytes_and_corruption_are_distinguished(self):
         download = module("dilo_download", "scripts/download-model.py")
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR", str(ROOT / "Tests"))) as tmp:
