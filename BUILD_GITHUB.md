@@ -7,12 +7,34 @@ Repositorio autorizado: https://github.com/soportetinvalu/dilo (público).
 La autorización anterior ya fue resuelta: `check` y `git-check --en-linea`
 devuelven APTO y GitHub confirma `permissions.push=true` con el token del canal.
 Christian aprobó expresamente la identidad local `Dilo <dictado@localhost>`.
-Se conserva el trabajo anterior; la publicación y ejecución se verifican mediante
-el mismo ejecutor. Hasta registrar una ejecución verde y descargar el artefacto,
-no se afirma que exista un binario comprobado.
+Se conserva el trabajo anterior; la publicación y ejecución se verificaron mediante
+el mismo ejecutor. **Ya existe un binario descargado y verificado.**
 Página de Actions: https://github.com/soportetinvalu/dilo/actions
 
-## Qué hace el workflow preparado
+Primera ejecución verde verificada:
+https://github.com/soportetinvalu/dilo/actions/runs/41233915972
+Commit compilado: `fad9f83094e297552371c9d40868b0677518b946`.
+Artefacto: https://github.com/soportetinvalu/dilo/actions/runs/41233915972/artifacts/13055007488
+El ZIP interior tiene 566807622 bytes y SHA-256
+`47f93eabb15f5a3262f992e84dcd618290b9747b952a35c8831829627b2baafe`.
+El artefacto requiere sesión de GitHub y caduca el 14 de noviembre de 2026,
+a las 19:26:49 UTC. No es una descarga permanente ni un Release.
+Las ejecuciones manuales posteriores generan su propio ZIP y checksum;
+no debe reutilizarse el hash de esta primera compilación para otro run.
+
+Validado en macOS 15.8.2, arm64, Xcode 16.4, Swift 6.1.2: pruebas Swift,
+22 pruebas Python ejecutadas y una guarda exclusiva de Linux omitida,
+compilación release, firma ad hoc, cero dependencias externas, carga local
+e inferencia Core ML sobre silencio, y verificación tras extraer el ZIP.
+La descarga se comprobó además en Linux: SHA-256, CRC de todas las entradas,
+21 archivos reales del modelo con hashes/tamaños, Mach-O arm64, icono exacto,
+recursos SwiftPM y licencias. La firma Apple se verifica en CI, no en Linux.
+
+Fallos corregidos sin omitir pruebas: retirada del runner `macos-14`;
+guardas de integridad con rechazo explícito para Bash 3.2; selección
+`encoderPrecision: .int8V2` para el `Encoder_v2.mlmodelc` realmente empaquetado.
+
+## Qué hace el workflow
 
 `.github/workflows/dilo-macos.yml` usa `macos-15` Apple Silicon y rechaza Intel.
 El primer run (41233169157) fue cancelado antes de ejecutar pasos por el brownout

@@ -1,5 +1,45 @@
 # Dilo 0.1.1 — evidencia y límites de la entrega
 
+## Resultado binario verificado
+
+**Dilo.app compilada y empaquetada con su modelo local; ZIP descargado y comprobado.**
+Primera ejecución correcta: https://github.com/soportetinvalu/dilo/actions/runs/41233915972
+Commit: `fad9f83094e297552371c9d40868b0677518b946`.
+Descarga: https://github.com/soportetinvalu/dilo/actions/runs/41233915972/artifacts/13055007488
+(sesión GitHub; caduca el 14 de noviembre de 2026 a las 19:26:49 UTC).
+ZIP interior: `Dilo-v0.1.1-macos-arm64.zip`, 566807622 bytes.
+SHA-256: `47f93eabb15f5a3262f992e84dcd618290b9747b952a35c8831829627b2baafe`.
+Cada run posterior genera otro ZIP y su checksum propio.
+
+- Plataforma real: macOS 15.8.2, arm64, Xcode 16.4, Swift 6.1.2.
+- Suite Swift de lógica correcta; Python: 23 casos, 22 ejecutados correctos y
+  una guarda específica de Linux omitida en Mac. Linux: 23 correctos, sin omisiones.
+- Compilación release de app y comprobador; firma ad hoc comprobada con codesign.
+- Auditoría Mach-O: cero dependencias externas; recursos SwiftPM y licencias incluidos.
+- Core ML cargó pesos locales e infirió 1 s de silencio desde copia separada con
+  HOME vacío. No resuelve repositorios; no se afirma aislamiento de red del runner.
+- El ZIP se extrajo de nuevo en Mac y se verificaron firma, dependencias y pesos.
+- Descarga recibida: SHA-256 y CRC correctos; 21 archivos del modelo,
+  632174014 bytes, hashes del lock exactos, Mach-O arm64 e icono original exacto.
+
+Incidencias reales: run 41233169157 cancelado por brownout de macos-14;
+41233286519 detectó guardas negativas que Bash 3.2 no rechazaba con `set -e`;
+41233509229 detectó que el cargador buscaba Encoder.mlmodelc cuando se
+empaquetaba Encoder_v2.mlmodelc. Corregidos con runner macos-15, rechazo
+explícito y precisión int8V2 en app y comprobador; las pruebas siguen activas.
+
+Límites: no hay Developer ID ni notarización. No se ha probado Gatekeeper de
+una descarga, apertura gráfica, micrófono, TCC, tecla global, voz real, pegado,
+portapapeles ni pulido con la sesión del usuario. El pulido sigue requiriendo
+`codex` y su sesión propia. No se creó Release público.
+
+---
+
+## Registro histórico de preparación (anterior al binario)
+
+Los apartados siguientes conservan la evidencia de las fases anteriores;
+sus pendientes de compilación quedan resueltos por el resultado de arriba.
+
 ## Publicación y compilación en GitHub
 
 El bloqueo anterior del ejecutor está resuelto: diagnóstico y comprobación en línea

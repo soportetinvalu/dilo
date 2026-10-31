@@ -7,20 +7,22 @@ Mantienes una tecla, hablas, la sueltas y el texto aparece donde tengas el curso
 - **Pulido opcional:** el texto transcrito se corrige (puntuación, mayúsculas, muletillas) con **ChatGPT**, usando el programa `codex` con tu sesión «Sign in with ChatGPT». No se usa ninguna API key de pago. **Solo viaja el texto, nunca el audio.** Se puede apagar con un interruptor y, si `codex` falla o tarda demasiado, se inserta el texto sin pulir.
 - **Tecla configurable:** desde Ajustes eliges qué tecla usar (incluso un modificador solo, como Option derecha, que es el valor inicial).
 
-> Actualización 0.1.1: nombre **Dilo** e icono de la imagen proporcionada. El usuario probó la app original en su Mac; **esta actualización no se ha compilado ni ejecutado en macOS**. Para actualizar con doble clic, abre **LEEME CHRISTIAN.txt** en TextEdit. Evidencia y límites: **VERIFICACION.md**.
+> Actualización 0.1.1: nombre **Dilo** e icono de la imagen proporcionada. **Compilada y verificada en GitHub Actions sobre macOS arm64**, con carga e inferencia Core ML de los pesos incluidos. No sustituye la prueba de micrófono, permisos y pegado en tu Mac. Para el binario, lee **LEEME-DILO-APP.txt**; para compilar fuentes, **LEEME CHRISTIAN.txt**. Evidencia y límites: **VERIFICACION.md**.
 
-> Compilación binaria en GitHub Actions: lee **BUILD_GITHUB.md**. El repositorio y la identidad de publicación están autorizados; la entrega exige una ejecución verde y un ZIP descargado y verificado. El ZIP de fuentes no es una app. No se crea un Release público.
+> Descarga: [GitHub Actions](https://github.com/soportetinvalu/dilo/actions/workflows/dilo-macos.yml) → ejecución correcta → **Artifacts** → `Dilo-v0.1.1-macos-arm64-…`. Requiere iniciar sesión en GitHub; el artefacto se conserva 14 días y contiene el ZIP de `Dilo.app`, SHA-256, guía y evidencia. No es un Release público. El ZIP de fuentes no es una app.
 
-## Requisitos
+## Requisitos para compilar desde fuentes
 
 | Qué | Detalle |
 |---|---|
 | Mac | Apple Silicon (tu Mac mini M4), macOS 14 o más reciente |
 | Herramientas de Xcode | Con las *Command Line Tools* basta, pero tiene que ser Swift **6.0 o superior** (Xcode 16+). Se instalan con `xcode-select --install`. Comprueba con `swift --version`. |
-| Internet | Para descargar FluidAudio al compilar y el modelo de voz (≈ 500 MB) la primera vez que se abre la app |
+| Internet | Para descargar FluidAudio al compilar y el modelo de voz en compilaciones ligeras; el binario de Actions incluye los pesos (632 MB sin comprimir) |
 | `codex` (solo para el pulido) | `npm i -g @openai/codex` y luego `codex login` eligiendo **Sign in with ChatGPT** |
 
 Si no quieres el pulido, no necesitas `codex`: apágalo en Ajustes y la app dicta igual.
+El binario de Actions no necesita Xcode ni Swift instalado para dictar y carga sus
+pesos locales sin descargarlos. Tiene firma ad hoc, no Developer ID ni notarización.
 
 ## Compilar y abrir
 
@@ -104,8 +106,8 @@ con el prompt por entrada estándar (no en la lista de procesos). Detalles:
 ## Privacidad
 
 - El audio se graba en memoria, se transcribe localmente y se descarta. No se guarda en disco.
-- El modelo de voz se descarga una vez de HuggingFace a `~/Library/Application Support/FluidAudio/Models/`.
-- Con el pulido activo, el texto transcrito se envía a ChatGPT a través de `codex`. Con el pulido apagado no sale nada del Mac (salvo la descarga inicial del modelo).
+- El binario de Actions incluye el modelo dentro de la app; las compilaciones ligeras de fuentes lo descargan una vez de HuggingFace a `~/Library/Application Support/FluidAudio/Models/`.
+- Con el pulido activo, el texto transcrito se envía a ChatGPT a través de `codex`. Con el pulido apagado se transcribe localmente (las compilaciones ligeras necesitan la descarga inicial del modelo).
 - El portapapeles se usa solo un instante para pegar y se restaura (incluidas imágenes y otros formatos); el texto temporal se marca para que los gestores de portapapeles lo ignoren.
 
 ## Solución de problemas
@@ -127,9 +129,9 @@ con el prompt por entrada estándar (no en la lista de procesos). Detalles:
 
 ## Qué no se ha probado
 
-La app original fue probada por el usuario en su Mac, con el pulido ChatGPT apagado. Eso no valida este nuevo paquete. **La actualización Dilo no se ha compilado ni ejecutado en macOS**. En este entorno Linux no hay Swift; `scripts/selftest.sh` no puede ejecutarse aquí. Las verificaciones realmente ejecutadas, los resultados y las pruebas pendientes están en `VERIFICACION.md`. Lo que hay que comprobar en el Mac:
+La app original fue probada por el usuario en su Mac, con el pulido ChatGPT apagado. La actualización Dilo ya compiló en macOS 15 arm64 con Swift 6.1.2 y pasó las pruebas de lógica, firma, dependencias, carga e inferencia Core ML sobre silencio y verificación tras extraer el ZIP. Eso **no prueba una sesión de dictado con voz real ni la interfaz del usuario**. Las verificaciones y límites están en `VERIFICACION.md`. Lo que hay que comprobar en el Mac:
 
-**Qué probar primero:** que compila; que el modelo se descarga y carga; que la tecla se detecta con los permisos; que el pegado funciona en Notas, el navegador y un editor; que `codex exec` con tu sesión devuelve el texto pulido; el comportamiento de respaldo (apagar wifi con el pulido activo); cambiar de tecla en Ajustes; elegir otro micrófono.
+**Qué probar primero:** que la app se abre tras la descarga y carga el modelo; que la tecla se detecta con los permisos; que el pegado funciona en Notas, el navegador y un editor; que `codex exec` con tu sesión devuelve el texto pulido; el comportamiento de respaldo (apagar wifi con el pulido activo); cambiar de tecla en Ajustes; elegir otro micrófono.
 
 No incluido (a propósito, para mantenerlo sencillo): inserción directa por Accesibilidad (solo portapapeles + ⌘V), cancelar con Esc durante la grabación, vista previa de texto parcial, historial, vocabulario personalizado, otros idiomas.
 
