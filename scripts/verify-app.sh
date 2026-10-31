@@ -8,12 +8,15 @@ fi
 APP="${1:?Indica la ruta de Dilo.app}"
 PLIST="$APP/Contents/Info.plist"
 read_plist() { /usr/libexec/PlistBuddy -c "Print :$1" "$PLIST"; }
-[[ "$(read_plist CFBundleIdentifier)" == "local.dictado.DictadoMac" ]]
-[[ "$(read_plist CFBundleExecutable)" == "DictadoMac" ]]
-[[ "$(read_plist CFBundleDisplayName)" == "Dilo" ]]
-[[ "$(read_plist CFBundleName)" == "Dilo" ]]
-[[ "$(read_plist CFBundleIconFile)" == "Dilo.icns" ]]
-[[ -x "$APP/Contents/MacOS/DictadoMac" ]]
-[[ -s "$APP/Contents/Resources/Dilo.icns" ]]
+# Bash 3.2 (macOS) no aplica errexit a todos los comandos compuestos [[ ... ]].
+# Las guardas de integridad deben rechazar explícitamente, no depender de set -e.
+reject() { echo "Bundle rechazado: $1 ($APP)" >&2; exit 1; }
+[[ "$(read_plist CFBundleIdentifier)" == "local.dictado.DictadoMac" ]] || reject CFBundleIdentifier
+[[ "$(read_plist CFBundleExecutable)" == "DictadoMac" ]] || reject CFBundleExecutable
+[[ "$(read_plist CFBundleDisplayName)" == "Dilo" ]] || reject CFBundleDisplayName
+[[ "$(read_plist CFBundleName)" == "Dilo" ]] || reject CFBundleName
+[[ "$(read_plist CFBundleIconFile)" == "Dilo.icns" ]] || reject CFBundleIconFile
+[[ -x "$APP/Contents/MacOS/DictadoMac" ]] || reject ejecutable
+[[ -s "$APP/Contents/Resources/Dilo.icns" ]] || reject icono
 codesign --verify --deep --strict "$APP"
 echo "Bundle e integridad de firma correctos: $APP"

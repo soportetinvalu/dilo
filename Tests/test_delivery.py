@@ -331,13 +331,15 @@ class ScriptSafetyWithMocks(unittest.TestCase):
     def test_missing_icon_or_changed_identity_is_rejected(self):
         path = self.source / "Contents/Info.plist"
         original = path.read_bytes()
-        for key in ["CFBundleIconFile", "CFBundleIdentifier"]:
+        for key in ["CFBundleIconFile", "CFBundleIdentifier", "CFBundleExecutable",
+                    "CFBundleDisplayName", "CFBundleName"]:
             with self.subTest(key=key):
                 p = plistlib.loads(original)
                 p[key] = "incorrecto"
                 path.write_bytes(plistlib.dumps(p))
                 result = self.run_script()
-                self.assertNotEqual(result.returncode, 0)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("Bundle rechazado: " + key, result.stderr)
                 self.assert_untouched()
         path.write_bytes(original)
         (self.source / "Contents/Resources/Dilo.icns").unlink()

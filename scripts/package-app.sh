@@ -9,7 +9,7 @@ ZIP="$PWD/dist/Dilo-v0.1.1-macos-arm64.zip"
 ./scripts/verify-app.sh "$APP"
 python3 scripts/verify-runtime.py "$APP"
 python3 scripts/download-model.py "$APP/Contents/Resources/ParakeetV3" --verify-only
-[[ "$(lipo -archs "$APP/Contents/MacOS/DictadoMac")" == arm64 ]]
+[[ "$(lipo -archs "$APP/Contents/MacOS/DictadoMac")" == arm64 ]] || { echo "Arquitectura no compatible" >&2; exit 1; }
 cp LEEME-DILO-APP.txt dist/
 ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
 ROUNDTRIP="$(mktemp -d "$PWD/dist/.dilo-roundtrip.XXXXXX")"
