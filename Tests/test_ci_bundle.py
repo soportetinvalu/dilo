@@ -41,6 +41,10 @@ class ModelIntegrity(unittest.TestCase):
     def test_public_fixtures_and_wer_are_real_and_discriminate_errors(self):
         compare = module("speech_comparison", "scripts/compare-public-speech.py")
         _, fixture = compare.verified_fixtures()
+        source_package = module("source_with_public_audio", "scripts/package-source.py")
+        for entry in fixture["samples"]:
+            self.assertIn("Tests/Fixtures/" + entry["path"], source_package.TOP_FILES)
+        self.assertNotIn(".wav", source_package.DIRECTORIES["Tests"])
         exact = [dict(path=x["path"], text=x["reference"]) for x in fixture["samples"]]
         self.assertEqual(compare.score(fixture["samples"], exact)["wer"], 0)
         broken = [dict(path=x["path"], text="palabra equivocada") for x in fixture["samples"]]

@@ -15,7 +15,10 @@ TOP_FILES = [
     ".gitignore", "LICENSE", "THIRD_PARTY_NOTICES.md", "Package.swift", "README.md",
     "EMPEZAR AQUI.txt", "LEEME CHRISTIAN.md", "LEEME CHRISTIAN.txt", "VERIFICACION.md",
     "Actualizar Dilo.command", "Instalar herramientas.command", "Package.resolved",
-    "BUILD_GITHUB.md", ".github/workflows/dilo-macos.yml", "LEEME-DILO-APP.txt",
+    "BUILD_GITHUB.md", "RESTAURACION_ENCODER.md", ".github/workflows/dilo-macos.yml", "LEEME-DILO-APP.txt",
+    # Lista cerrada de voz pública; nunca aceptar *.wav de forma general.
+    "Tests/Fixtures/minds14-es-0.wav", "Tests/Fixtures/minds14-es-1.wav",
+    "Tests/Fixtures/minds14-es-2.wav",
     "Resources/licenses/CC-BY-4.0.txt", "Resources/licenses/FluidAudio-LICENSE",
     "Resources/licenses/NemoTextProcessing-LICENSE",
 ]
