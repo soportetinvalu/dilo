@@ -14,7 +14,10 @@ Página de Actions: https://github.com/soportetinvalu/dilo/actions
 
 ## Qué hace el workflow preparado
 
-`.github/workflows/dilo-macos.yml` usa `macos-14` Apple Silicon y rechaza Intel.
+`.github/workflows/dilo-macos.yml` usa `macos-15` Apple Silicon y rechaza Intel.
+El primer run (41233169157) fue cancelado antes de ejecutar pasos por el brownout
+programado de `macos-14`, en retirada el 2 de noviembre de 2026:
+https://github.com/actions/runner-images/issues/13518
 La tabla oficial actual de GitHub identifica ese label como arm64:
 https://docs.github.com/en/actions/reference/runners/github-hosted-runners
 La compilación exige Swift 6, macOS 14+ y mantiene el identificador anterior.

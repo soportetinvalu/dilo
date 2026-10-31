@@ -17,8 +17,8 @@ concurrency:
 
 jobs:
   build:
-    # macos-14 es arm64 según la tabla actual de GitHub; la guarda evita Rosetta/Intel.
-    runs-on: macos-14
+    # macos-15 es arm64; macos-14 está en retirada. La guarda evita Rosetta/Intel.
+    runs-on: macos-15
     timeout-minutes: 60
     env:
       MACOSX_DEPLOYMENT_TARGET: '14.0'
