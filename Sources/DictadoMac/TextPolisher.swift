@@ -26,8 +26,21 @@ final class TextPolisher: ObservableObject {
     /// Opciones de `codex exec` que la versión instalada realmente admite.
     private var supportedFlags: [String] = []
 
-    init(settings: AppSettings) {
+    private let home: String
+    private let inheritedEnvironment: [String: String]
+    private let workDirectory: URL?
+
+    init(settings: AppSettings, home: String = NSHomeDirectory(),
+         environment: [String: String] = ProcessInfo.processInfo.environment,
+         workDirectory: URL? = nil) {
         self.settings = settings
+        self.home = home
+        self.inheritedEnvironment = environment
+        self.workDirectory = workDirectory
+    }
+
+    private func environment(for url: URL) -> [String: String] {
+        CodexInstallation.environment(for: url, inherited: inheritedEnvironment, home: home)
     }
 
     var isUsable: Bool { !isConnecting && status == .ready && codexURL != nil }
@@ -52,13 +65,14 @@ final class TextPolisher: ObservableObject {
         guard status == .notLoggedIn, let url = codexURL else {
             if status == .ready { connectionMessage = "Ya hay una sesión local de ChatGPT. No se ha cambiado la cuenta." }
             else if status == .usingAPIKey { connectionMessage = "Hay otra sesión de codex. Dilo no cierra ni sustituye cuentas existentes." }
+            else { connectionMessage = "No se pudo iniciar la conexión: \(status.summary)." }
             return
         }
         connectionMessage = "Completa la conexión en tu navegador. Si no se abre, cancela y comprueba la instalación de codex."
         do {
             let outcome = try await browserLogin.run(
-                executable: url, environment: CodexInstallation.environment(for: url),
-                workingDirectory: Self.emptyWorkDirectory()
+                executable: url, environment: environment(for: url),
+                workingDirectory: workDirectory ?? Self.emptyWorkDirectory()
             )
             // La salida 0 del proceso no basta: volver a comprobar el tipo de sesión local.
             await checkStatus()
@@ -84,13 +98,13 @@ final class TextPolisher: ObservableObject {
 
     private func checkStatus() async {
         status = .checking
-        guard let url = await CodexInstallation.locate(customPath: settings.codexPath) else {
+        guard let url = await CodexInstallation.locate(customPath: settings.codexPath, home: home) else {
             codexURL = nil
             status = .notInstalled
             return
         }
         codexURL = url
-        let env = CodexInstallation.environment(for: url)
+        let env = environment(for: url)
         do {
             let login = try await ProcessRunner.run(
                 executable: url, arguments: ["login", "status"], environment: env, timeout: 20
@@ -128,7 +142,7 @@ final class TextPolisher: ObservableObject {
         defer { try? FileManager.default.removeItem(at: outFile) }
 
         // Directorio de trabajo vacío y propio: codex no ve ningún proyecto del usuario.
-        let workDir = Self.emptyWorkDirectory()
+        let workDir = workDirectory ?? Self.emptyWorkDirectory()
 
         var args = ["exec"] + supportedFlags
         args += ["--sandbox", "read-only", "--color", "never", "-o", outFile.path, "-C", workDir.path]
@@ -143,7 +157,7 @@ final class TextPolisher: ObservableObject {
             let result = try await ProcessRunner.run(
                 executable: codex, arguments: args,
                 stdin: PolishPrompt.build(for: raw),
-                environment: CodexInstallation.environment(for: codex),
+                environment: environment(for: codex),
                 workingDirectory: workDir,
                 timeout: timeout
             )

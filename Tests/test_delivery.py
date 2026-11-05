@@ -39,7 +39,7 @@ class Resources(unittest.TestCase):
         self.assertEqual(p["CFBundleIconFile"], "Dilo.icns")
         self.assertTrue(p["LSUIElement"])
         self.assertEqual(p["CFBundleShortVersionString"], "0.1.1")
-        self.assertEqual(p["CFBundleVersion"], "2")
+        self.assertEqual(p["CFBundleVersion"], "3")
         self.assertIn("Dilo necesita", p["NSMicrophoneUsageDescription"])
 
     def test_original_exact_and_all_icns_pixels(self):

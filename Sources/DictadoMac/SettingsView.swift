@@ -84,7 +84,7 @@ struct SettingsView: View {
                 if let message = polisher.connectionMessage {
                     Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
                 }
-                Text("La conexión se completa en tu navegador, sin Terminal. No se sustituye una sesión existente. Codex guarda la sesión en tu Mac; cancelar no cierra una sesión ya completada.")
+                Text("La conexión se completa en tu navegador, sin Terminal. Dilo comprueba la sesión antes de abrirlo; no conectes otra cuenta desde otra app al mismo tiempo. Codex guarda la sesión en tu Mac; cancelar no cierra una sesión ya completada.")
                     .font(.caption).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 

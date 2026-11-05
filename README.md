@@ -18,7 +18,7 @@ Mantienes una tecla, hablas, la sueltas y el texto aparece donde tengas el curso
 | Mac | Apple Silicon (tu Mac mini M4), macOS 14 o más reciente |
 | Herramientas de Xcode | Con las *Command Line Tools* basta, pero tiene que ser Swift **6.0 o superior** (Xcode 16+). Se instalan con `xcode-select --install`. Comprueba con `swift --version`. |
 | Internet | Para descargar FluidAudio al compilar y el modelo de voz en compilaciones ligeras; el binario de Actions incluye los pesos (632 MB sin comprimir) |
-| `codex` (solo para el pulido) | `npm i -g @openai/codex` y luego `codex login` eligiendo **Sign in with ChatGPT** |
+| `codex` (solo para el pulido) | Instala el CLI oficial (`npm i -g @openai/codex` si hace falta); conecta desde **Ajustes → Conectar ChatGPT**, en el navegador, sin abrir Terminal para iniciar sesión |
 
 Si no quieres el pulido, no necesitas `codex`: apágalo en Ajustes y la app dicta igual.
 El binario de Actions no necesita Xcode ni Swift instalado para dictar y carga sus
@@ -86,6 +86,16 @@ Para ver los registros de la app: `./scripts/run.sh --logs`.
 
 ## El pulido con ChatGPT (codex)
 
+**Versión 0.1.1, build 3:** conexión gráfica desde **Ajustes → Conectar ChatGPT**.
+El login solo empieza al pulsar el botón; activar el pulido no conecta cuentas.
+Dilo comprueba la sesión inmediatamente antes de iniciarlo, pero Codex no ofrece
+una operación atómica de «iniciar solo si sigue sin sesión»: **no conectes otra
+cuenta desde otra app al mismo tiempo**. Un cambio externo durante ese intervalo
+puede competir con el login; Dilo no bloquea, borra ni restaura credenciales ajenas.
+Cancelar o el plazo de 5 minutos corta el grupo de procesos propio, incluidos los
+hijos de wrappers npm, sin cerrar una sesión que ya se haya guardado.
+Detalles de privacidad, pruebas y límites: [Tests/CHATGPT_LOGIN.md](Tests/CHATGPT_LOGIN.md).
+
 La app ejecuta, para cada dictado, algo equivalente a:
 
 ```
@@ -96,7 +106,7 @@ codex exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read
 con el prompt por entrada estándar (no en la lista de procesos). Detalles:
 
 - Solo se envía el **texto** transcrito. Se ejecuta en una carpeta vacía y en modo solo lectura.
-- Se eliminan `OPENAI_API_KEY` y `CODEX_API_KEY` del entorno. Si `codex` estuviera logueado con API key en vez de ChatGPT, la app **no pule** y te lo dice (haz `codex logout && codex login` y elige ChatGPT).
+- Se eliminan `OPENAI_API_KEY`, `CODEX_API_KEY` y `CODEX_ACCESS_TOKEN` del entorno. Si existe una sesión con API key, la app **no pule**, no la cierra ni la sustituye. Usa una instalación/configuración de Codex independiente preparada por ti si necesitas otra cuenta; Dilo no modifica otras credenciales.
 - Las opciones `--ephemeral` / `--ignore-user-config` / `--skip-git-repo-check` solo se usan si tu versión de `codex` las admite (se comprueba con `codex exec --help`).
 - Si la respuesta es vacía, o su longitud es muy distinta a la del dictado (señal de que ChatGPT contestó o inventó en vez de corregir), se descarta y se usa el texto crudo.
 - El estado de `codex` (no instalado / sin sesión / listo) se ve en el menú y en Ajustes. «Comprobar de nuevo» vuelve a mirar.
@@ -120,8 +130,8 @@ con el prompt por entrada estándar (no en la lista de procesos). Detalles:
 | Al dictar dice «El modelo de voz aún no está listo» | Espera: se está descargando o preparando (la primera vez tarda). Si da error, «Reintentar» en Ajustes → General. |
 | No se pega, el texto queda en el portapapeles | Falta el permiso de Accesibilidad. Pega con ⌘V. También ocurre en campos de contraseña o con «Secure Keyboard Entry» activo en la Terminal. |
 | El pegado devuelve el portapapeles viejo demasiado pronto en alguna app | Algunas apps leen el portapapeles tarde. Sube `restoreDelay` en `Sources/DictadoMac/TextInserter.swift` (300 ms) y recompila. |
-| «codex: no está instalado» pero sí lo tienes | Pon la ruta en Ajustes (`which codex` en la Terminal te la da). La app abre en un entorno sin tu PATH de Terminal; si `codex` viene de `nvm`, usa la ruta completa. |
-| «codex: no has iniciado sesión» | En la Terminal: `codex login` → *Sign in with ChatGPT*. |
+| «codex: no se encontró codex» pero sí lo tienes | En Ajustes, usa **Elegir…** para seleccionar el ejecutable o escribe su ruta completa. La detección respeta las rutas habituales, nvm y el PATH del shell antes del fallback Hermes. |
+| «codex: sin sesión» | Ajustes → **Conectar ChatGPT** y completa el consentimiento en el navegador. **Cancelar conexión** detiene el proceso local y sus hijos; no revoca sesiones ya guardadas. |
 | El pulido tarda mucho | Esfuerzo de razonamiento «Bajo»; baja la espera máxima (p. ej. 8 s); prueba otro modelo en Ajustes. |
 | Se pierden las primeras palabras | Empieza a hablar cuando suene el «tink»/aparezca el indicador rojo; abrir el micrófono tarda una fracción de segundo. |
 | Option derecha no dicta pero escribe acentos | Estás pulsando otra tecla a la vez: la grabación se descarta a propósito. Elige otra tecla en Ajustes si te molesta. |

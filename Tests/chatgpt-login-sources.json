@@ -3,8 +3,8 @@
   "reason": "Delta expl\u00edcito de conexi\u00f3n ChatGPT en navegador; los dem\u00e1s archivos conservan dictation-baseline.json.",
   "files": {
     "Sources/DictadoMac/AppSettings.swift": "f6fb470f9233ccbf020431859264d1f1d3cb229235ee0fbfc683e3476fb83e97",
-    "Sources/DictadoMac/TextPolisher.swift": "855dafec7eba74f1995f937301e0057326f6a74226a0fe67736bcced1f4bffc2",
-    "Sources/DictadoMac/SettingsView.swift": "bb559189beac85802652a4b24a6be1ad62c9a8c00b04b3746893e043c1c7af8e",
-    "Sources/DictadoMac/CodexConnection.swift": "9ed3a919b03f3492ac1f477c2de84d7f8ab5f96db4cb0f9c10695202d47532bb"
+    "Sources/DictadoMac/TextPolisher.swift": "17df8851e7d3381d4a60489fb8be029c9cfa0e1b643c98a023f41abc5c4bd6ad",
+    "Sources/DictadoMac/SettingsView.swift": "eadc48e7348bb20f13f1b046e9f59f98e62e89327c18208c7fe6b64f7f13fe51",
+    "Sources/DictadoMac/CodexConnection.swift": "63498d1f7121546ad9e29c61ee610398e17ed0763b9024ca57c6554774e62f8e"
   }
 }
