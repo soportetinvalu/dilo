@@ -149,9 +149,36 @@ struct DiloPrivateCheck {
         for (label, plain) in inputs {
             let digest = hex(SHA256.hash(data: plain))
             let samples = try parseWav(plain)
-            var state = TdtDecoderState.make(decoderLayers: await asr.decoderLayerCount)
+            // Matriz 2x2; ninguna ventana independiente supera 14 s (<240000 muestras).
+            // La API pública procesa el audio completo con ChunkProcessor internamente.
+            // No añadimos puntos ni normalización ni deduplicación al unir fragmentos.
+            let conditions: [(String, Bool, Bool)] = [
+                ("entero-es", false, true), ("entero-auto", false, false),
+                ("fragmentos-es", true, true), ("fragmentos-auto", true, false),
+                ("entero-es-repetido", false, true),
+            ]
+            var variants: [[String: Any]] = []
             let start = Date()
-            let output = try await asr.transcribe(samples, decoderState: &state, language: .spanish)
+            for (condition, fragmented, spanish) in conditions {
+                let step = fragmented ? 224_000 : samples.count
+                var segments: [[String: Any]] = []
+                let conditionStart = Date()
+                for lower in stride(from: 0, to: samples.count, by: step) {
+                    let upper = min(lower + step, samples.count)
+                    let chunk = Array(samples[lower..<upper])
+                    var state = TdtDecoderState.make(decoderLayers: await asr.decoderLayerCount)
+                    let output = try await asr.transcribe(chunk, decoderState: &state,
+                                                          language: spanish ? .spanish : nil)
+                    segments.append(["start_frame": lower, "end_frame": upper,
+                                     "frames": chunk.count,
+                                     "text": output.text.trimmingCharacters(in: .whitespacesAndNewlines)])
+                }
+                variants.append(["condition": condition,
+                                 "language": spanish ? "spanish" : "nil-no-script-filter",
+                                 "fragmented": fragmented, "segments": segments,
+                                 "text": segments.map { $0["text"] as! String }.joined(separator: " "),
+                                 "transcribe_seconds": Date().timeIntervalSince(conditionStart)])
+            }
             let elapsed = Date().timeIntervalSince(start)
             let result: [String: Any] = [
                 "format": "dilo-private-result-v1",
@@ -169,7 +196,9 @@ struct DiloPrivateCheck {
                 "transcribe_seconds": elapsed,
                 "os": ProcessInfo.processInfo.operatingSystemVersionString,
                 "input_kind": "archivo WAV descifrado en memoria; no es entrada de micrófono",
-                "text": output.text.trimmingCharacters(in: .whitespacesAndNewlines),
+                "text": variants[0]["text"] as! String,
+                "variants": variants,
+                "matrix": "2x2 plus repeated entero-es control; independent windows <=224000 frames; no punctuation added",
             ]
             let json = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
             let sealed = try seal(json, label: label, runID: runID, recipient: recipient)
