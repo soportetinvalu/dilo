@@ -51,7 +51,7 @@ struct CodexLoginTests {
           stubborn) trap '' TERM; exec /bin/sleep 30 ;;
           *) exit 8 ;;
         esac
-        ""#)
+        """#)
         try fm.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fake.path)
         try write(state, "not")
         try write(mode, "success")
