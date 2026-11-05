@@ -13,6 +13,7 @@ struct SettingsView: View {
     @State private var permissionTick = 0 // se incrementa cada segundo para refrescar el estado de los permisos
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var launchError: String?
+    private var codexBusy: Bool { polisher.isConnecting || polisher.status == .checking }
 
     var body: some View {
         Form {
@@ -68,13 +69,33 @@ struct SettingsView: View {
                         .foregroundStyle(polisher.status == .ready ? Color.green : Color.orange)
                     Spacer()
                     Button("Comprobar de nuevo") { Task { await polisher.refreshStatus() } }
+                        .disabled(codexBusy)
                 }
+
+                HStack {
+                    if polisher.isConnecting {
+                        ProgressView().controlSize(.small)
+                        Button("Cancelar conexión") { polisher.cancelChatGPTConnection() }
+                    } else {
+                        Button("Conectar ChatGPT") { Task { await polisher.connectChatGPT() } }
+                            .disabled(codexBusy || polisher.status == .ready || polisher.status == .usingAPIKey)
+                    }
+                }
+                if let message = polisher.connectionMessage {
+                    Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
+                }
+                Text("La conexión se completa en tu navegador, sin Terminal. No se sustituye una sesión existente. Codex guarda la sesión en tu Mac; cancelar no cierra una sesión ya completada.")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 HStack {
                     TextField("Ruta de codex (vacío = automática)", text: $settings.codexPath)
                         .textFieldStyle(.roundedBorder)
                     Button("Elegir…") { chooseCodex() }
                 }
+                .disabled(codexBusy)
+                Text("Detección automática: incluye ~/.hermes/node/bin/codex. Una ruta escrita tiene prioridad.")
+                    .font(.caption).foregroundStyle(.secondary)
                 TextField("Modelo (opcional, vacío = el predeterminado de codex)", text: $settings.codexModel)
                     .textFieldStyle(.roundedBorder)
                 Picker("Esfuerzo de razonamiento", selection: $settings.codexReasoning) {

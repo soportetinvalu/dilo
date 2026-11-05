@@ -1,28 +1,6 @@
 import Foundation
+import Combine
 import os
-
-/// Estado del CLI `codex` (ChatGPT), para el menú y Ajustes.
-enum CodexStatus: Equatable {
-    case unknown
-    case checking
-    case ready
-    case notInstalled
-    case notLoggedIn
-    case usingAPIKey
-    case failed(String)
-
-    var summary: String {
-        switch self {
-        case .unknown: return "sin comprobar"
-        case .checking: return "comprobando…"
-        case .ready: return "listo (sesión de ChatGPT)"
-        case .notInstalled: return "no está instalado — ejecuta: npm i -g @openai/codex"
-        case .notLoggedIn: return "no has iniciado sesión — ejecuta en Terminal: codex login"
-        case .usingAPIKey: return "está logueado con API key; ejecuta: codex logout && codex login (elige ChatGPT)"
-        case .failed(let reason): return "error: \(reason)"
-        }
-    }
-}
 
 enum PolishOutcome {
     case polished(String)
@@ -37,6 +15,10 @@ enum PolishOutcome {
 @MainActor
 final class TextPolisher: ObservableObject {
     @Published private(set) var status: CodexStatus = .unknown
+    @Published private(set) var isConnecting = false
+    @Published private(set) var connectionMessage: String?
+    private let browserLogin = CodexBrowserLogin()
+    private var connectionCancelled = false
 
     private let settings: AppSettings
     private let log = Logger(subsystem: "local.dictado.DictadoMac", category: "Polisher")
@@ -48,85 +30,88 @@ final class TextPolisher: ObservableObject {
         self.settings = settings
     }
 
-    var isUsable: Bool { status == .ready && codexURL != nil }
+    var isUsable: Bool { !isConnecting && status == .ready && codexURL != nil }
 
     // MARK: Comprobación de instalación y login
 
     func refreshStatus() async {
+        guard !isConnecting, status != .checking else { return }
+        await checkStatus()
+    }
+
+    /// Nunca se llama al arrancar la app: únicamente desde el botón de Ajustes.
+    func connectChatGPT() async {
+        guard !isConnecting, status != .checking else { return }
+        isConnecting = true
+        connectionCancelled = false
+        connectionMessage = nil
+        defer { isConnecting = false }
+        // Se relee la sesión justo antes de iniciar OAuth. Una sesión existente no se sustituye.
+        await checkStatus()
+        guard !connectionCancelled else { connectionMessage = "Conexión cancelada."; return }
+        guard status == .notLoggedIn, let url = codexURL else {
+            if status == .ready { connectionMessage = "Ya hay una sesión local de ChatGPT. No se ha cambiado la cuenta." }
+            else if status == .usingAPIKey { connectionMessage = "Hay otra sesión de codex. Dilo no cierra ni sustituye cuentas existentes." }
+            return
+        }
+        connectionMessage = "Completa la conexión en tu navegador. Si no se abre, cancela y comprueba la instalación de codex."
+        do {
+            let outcome = try await browserLogin.run(
+                executable: url, environment: CodexInstallation.environment(for: url),
+                workingDirectory: Self.emptyWorkDirectory()
+            )
+            // La salida 0 del proceso no basta: volver a comprobar el tipo de sesión local.
+            await checkStatus()
+            switch outcome {
+            case .exited(0) where status == .ready:
+                connectionMessage = "Sesión local de ChatGPT conectada. Falta probar un dictado con pulido."
+            case .cancelled:
+                connectionMessage = "Se canceló la espera. No se ha cerrado ninguna sesión; comprueba el estado si terminaste en el navegador."
+            case .timedOut:
+                connectionMessage = "Se agotaron los 5 minutos de espera. Puedes volver a intentarlo."
+            default:
+                connectionMessage = "No se pudo confirmar la conexión. Revisa codex y vuelve a intentarlo; no se ha cerrado ninguna sesión."
+            }
+        } catch {
+            connectionMessage = "No se pudo iniciar la conexión con codex. Revisa el ejecutable y vuelve a intentarlo."
+        }
+    }
+
+    func cancelChatGPTConnection() {
+        connectionCancelled = true
+        browserLogin.cancel()
+    }
+
+    private func checkStatus() async {
         status = .checking
-        guard let url = await locateCodex() else {
+        guard let url = await CodexInstallation.locate(customPath: settings.codexPath) else {
             codexURL = nil
             status = .notInstalled
             return
         }
         codexURL = url
-        let env = Self.environment(for: url)
+        let env = CodexInstallation.environment(for: url)
         do {
-            // 1) ¿Hay sesión? `codex login status` termina con código 0 si hay sesión.
             let login = try await ProcessRunner.run(
-                executable: url, arguments: ["login", "status"],
-                environment: env, timeout: 20
+                executable: url, arguments: ["login", "status"], environment: env, timeout: 20
             )
-            if login.timedOut { status = .failed("codex no respondió al comprobar la sesión"); return }
-            let text = (login.stdout + "\n" + login.stderr).lowercased()
-            if login.exitCode != 0 { status = .notLoggedIn; return }
-            if text.contains("api key") || text.contains("apikey") { status = .usingAPIKey; return }
-
-            // 2) ¿Qué opciones admite esta versión de `codex exec`?
+            let accountStatus = CodexStatus.fromLoginStatus(login)
+            guard accountStatus == .ready else { status = accountStatus; return }
             let help = try await ProcessRunner.run(
-                executable: url, arguments: ["exec", "--help"],
-                environment: env, timeout: 20
+                executable: url, arguments: ["exec", "--help"], environment: env, timeout: 20
             )
+            guard !help.timedOut, help.exitCode == 0 else {
+                status = .failed("codex no respondió al comprobar las opciones de pulido")
+                return
+            }
             let helpText = help.stdout + help.stderr
             supportedFlags = ["--skip-git-repo-check", "--ephemeral", "--ignore-user-config"]
                 .filter { helpText.contains($0) }
             status = .ready
-            log.info("codex listo en \(url.path, privacy: .public); opciones: \(self.supportedFlags.joined(separator: " "), privacy: .public)")
         } catch {
-            status = .failed(error.localizedDescription)
+            // No propagar salida de autenticación, URLs ni detalles potencialmente sensibles.
+            status = .failed("no se pudo ejecutar codex; revisa su ruta y permisos")
         }
-    }
-
-    /// Busca el ejecutable: ruta de Ajustes → sitios habituales → el PATH de un shell de login.
-    private func locateCodex() async -> URL? {
-        let fm = FileManager.default
-
-        let custom = (settings.codexPath as NSString).expandingTildeInPath.trimmingCharacters(in: .whitespaces)
-        if !custom.isEmpty {
-            return fm.isExecutableFile(atPath: custom) ? URL(fileURLWithPath: custom) : nil
-        }
-
-        let home = NSHomeDirectory()
-        var candidates = [
-            "/opt/homebrew/bin/codex",
-            "/usr/local/bin/codex",
-            "\(home)/.local/bin/codex",
-            "\(home)/.npm-global/bin/codex",
-            "\(home)/.bun/bin/codex",
-            "\(home)/.volta/bin/codex",
-        ]
-        // nvm: ~/.nvm/versions/node/<versión>/bin/codex
-        let nvm = "\(home)/.nvm/versions/node"
-        if let versions = try? fm.contentsOfDirectory(atPath: nvm) {
-            candidates += versions.sorted().reversed().map { "\(nvm)/\($0)/bin/codex" }
-        }
-        if let found = candidates.first(where: { fm.isExecutableFile(atPath: $0) }) {
-            return URL(fileURLWithPath: found)
-        }
-
-        // Último recurso: preguntarle al shell de login del usuario (carga su PATH).
-        if let result = try? await ProcessRunner.run(
-            executable: URL(fileURLWithPath: "/bin/zsh"),
-            arguments: ["-lic", "command -v codex"],
-            timeout: 8
-        ) {
-            let line = result.stdout
-                .split(separator: "\n")
-                .map { $0.trimmingCharacters(in: .whitespaces) }
-                .last { $0.hasPrefix("/") }
-            if let line, fm.isExecutableFile(atPath: line) { return URL(fileURLWithPath: line) }
-        }
-        return nil
     }
 
     // MARK: Pulido
@@ -158,7 +143,7 @@ final class TextPolisher: ObservableObject {
             let result = try await ProcessRunner.run(
                 executable: codex, arguments: args,
                 stdin: PolishPrompt.build(for: raw),
-                environment: Self.environment(for: codex),
+                environment: CodexInstallation.environment(for: codex),
                 workingDirectory: workDir,
                 timeout: timeout
             )
@@ -187,20 +172,6 @@ final class TextPolisher: ObservableObject {
     }
 
     // MARK: Utilidades
-
-    /// Entorno del subproceso: PATH con la carpeta de codex (necesita `node`) y sin API keys.
-    private static func environment(for codex: URL) -> [String: String] {
-        var env = ProcessInfo.processInfo.environment
-        env.removeValue(forKey: "OPENAI_API_KEY")
-        env.removeValue(forKey: "CODEX_API_KEY")
-        let wanted = [codex.deletingLastPathComponent().path,
-                      "/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin", "/sbin"]
-        let existing = (env["PATH"] ?? "").split(separator: ":").map(String.init)
-        var seen = Set<String>()
-        env["PATH"] = (wanted + existing).filter { seen.insert($0).inserted }.joined(separator: ":")
-        env["HOME"] = NSHomeDirectory()
-        return env
-    }
 
     private static func emptyWorkDirectory() -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]

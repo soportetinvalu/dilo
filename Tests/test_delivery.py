@@ -20,7 +20,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 ORIGINAL_SHA = "859b57d5872d081706f3b2a44e444771b184f4533db59366d9f4777007ab23af"
 
-# Solo dos literales de ayuda pueden diferir de la base en SettingsView.
+# Normalización histórica de ayuda anterior a la conexión gráfica.
 # No se enmascaran bloques Swift ni se actualizan los hashes de la base.
 SETTINGS_COPY_CHANGES = {
     'La tecla todavía no funciona: faltan permisos (mira «Permisos» más abajo). Se activará sola al concederlos.':
@@ -77,7 +77,16 @@ class Resources(unittest.TestCase):
 
     def test_functional_sources_preserved(self):
         baseline = json.loads((ROOT / "Tests/dictation-baseline.json").read_text())
+        login_delta = json.loads((ROOT / "Tests/chatgpt-login-sources.json").read_text())
+        self.assertEqual(set(login_delta["files"]), {
+            "Sources/DictadoMac/AppSettings.swift", "Sources/DictadoMac/TextPolisher.swift",
+            "Sources/DictadoMac/SettingsView.swift", "Sources/DictadoMac/CodexConnection.swift",
+        })
+        for path, digest in login_delta["files"].items():
+            self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), digest, path)
         for path, digest in baseline["files"].items():
+            if path in login_delta["files"]:
+                continue  # Solo delta identificado y fijado arriba, no bloques enmascarados.
             with self.subTest(path=path):
                 data = (ROOT / path).read_bytes()
                 if path.endswith("AppDelegate.swift"):

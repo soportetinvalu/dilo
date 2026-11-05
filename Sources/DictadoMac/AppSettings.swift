@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Cómo se usa la tecla de dictado.
 enum DictationMode: String, CaseIterable, Identifiable {
@@ -39,7 +40,7 @@ enum CodexReasoning: String, CaseIterable, Identifiable {
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
 
     /// Tecla de dictado (valor inicial: Option derecha).
     @Published var hotkey: HotkeyBinding {
@@ -75,8 +76,8 @@ final class AppSettings: ObservableObject {
         didSet { defaults.set(soundsEnabled, forKey: "soundsEnabled") }
     }
 
-    private init() {
-        let store = UserDefaults.standard // (variable local: así no se lee `self` antes de terminar de inicializar)
+    init(store: UserDefaults = .standard) {
+        defaults = store
         store.register(defaults: [
             "mode": DictationMode.hold.rawValue,
             "polishEnabled": true,
