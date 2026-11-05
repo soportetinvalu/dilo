@@ -143,8 +143,12 @@ final class CodexBrowserLogin {
             try checked(posix_spawn_file_actions_addopen(&actions, descriptor, "/dev/null", descriptor == 0 ? O_RDONLY : O_WRONLY, 0))
         }
         // Sin shell, --with-api-key, --device-auth ni tokens.
-        let argv = [executable.path, "login"].map { strdup($0) } + [nil]
-        let envp = environment.map { strdup("\($0.key)=\($0.value)") } + [nil]
+        let argv: [UnsafeMutablePointer<CChar>?] = [executable.path, "login"].map { (value: String) in
+            value.withCString { strdup($0) }
+        } + [nil]
+        let envp: [UnsafeMutablePointer<CChar>?] = environment.map { entry in
+            "\(entry.key)=\(entry.value)".withCString { strdup($0) }
+        } + [nil]
         defer { for pointer in argv + envp { free(pointer) } }
         var child: pid_t = 0
         try argv.withUnsafeBufferPointer { args in
