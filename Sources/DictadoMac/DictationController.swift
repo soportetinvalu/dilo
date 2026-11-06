@@ -15,6 +15,7 @@ final class DictationController: ObservableObject {
     @Published private(set) var state: DictationState = .idle
     /// Último aviso útil para mostrar en el menú (p. ej. "se insertó sin pulir porque…").
     @Published private(set) var lastNotice: String?
+    let comparison = LastDictationComparison()
 
     let settings: AppSettings
     let transcriber: ParakeetTranscriber
@@ -90,6 +91,8 @@ final class DictationController: ObservableObject {
     // MARK: Grabar
 
     private func beginRecording() {
+        // Borrar antes de cualquier guarda: tampoco se conserva ante permisos/fallos.
+        comparison.clear()
         guard transcriber.state == .ready else {
             overlay.show(.message("El modelo de voz aún no está listo (\(transcriber.state.description))"), autoHideAfter: 3)
             return
@@ -150,13 +153,16 @@ final class DictationController: ObservableObject {
 
             var finalText = raw
             var polishNotice: String?
+            var polishStep = LastDictationComparison.PolishStep.disabled
             if settings.polishEnabled {
                 state = .polishing
                 overlay.show(.polishing)
                 switch await polisher.polish(raw) {
                 case .polished(let text):
                     finalText = text
+                    polishStep = .completed
                 case .fallback(let reason):
+                    polishStep = .fallback
                     polishNotice = "Se insertó el texto sin pulir: \(reason)"
                     log.notice("Pulido omitido: \(reason, privacy: .public)")
                 }
@@ -170,6 +176,9 @@ final class DictationController: ObservableObject {
             case .copiedOnly:
                 overlay.show(.message("Texto copiado al portapapeles (pega con ⌘V). Falta el permiso de Accesibilidad."), autoHideAfter: 5)
             }
+            // Misma transcripción y misma salida usadas arriba; sin repetir ASR/ChatGPT.
+            // Publicar al terminar el pegado evita robar el foco mientras se inserta.
+            comparison.capture(raw: raw, finalText: finalText, step: polishStep)
         } catch {
             log.error("Fallo al transcribir: \(error.localizedDescription, privacy: .public)")
             overlay.show(.message("Error al transcribir: \(error.localizedDescription)"), autoHideAfter: 4)

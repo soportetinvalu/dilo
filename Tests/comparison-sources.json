@@ -1,0 +1,24 @@
+{
+  "base_commit": "9f79cf1e2cf937e4931763944ad39fa9969184e9",
+  "files": {
+    "Sources/DictadoMac/AppDelegate.swift": "b4294ea10041f334b2dc26be809d02922bdc3c5e1287aa4b0c56a0c1130b38ed",
+    "Sources/DictadoMac/DictationController.swift": "e5a31fe117c67ee317918ffe7fbddbc3a7d53a2b1105199ac96d1a73369b8282",
+    "Sources/DictadoMac/LastDictationComparison.swift": "55f5c48605cca22a8ebbe73c317bd3ce87d7fa7bebdee44cf0c866c849e6b4aa",
+    "Sources/DictadoMac/DictationComparisonWindow.swift": "6a7db4e27876048ca532db5e1e9d4972d062348c346b4565cb9c5e7bd202ba71"
+  },
+  "insertions": {
+    "Sources/DictadoMac/AppDelegate.swift": [
+      "    private lazy var comparisonWindow = DictationComparisonWindow(comparison: controller.comparison)\n",
+      "        let compare = NSMenuItem(title: \"Ver último antes y después…\", action: #selector(showComparison), keyEquivalent: \"\")\n        compare.target = self\n        compare.isEnabled = controller.state == .idle && controller.comparison.snapshot != nil\n        // NSMenu auto-valida acciones: sin resultado tampoco debe poder habilitarla.\n        if !compare.isEnabled { compare.action = nil }\n        menu.addItem(compare)\n\n",
+      "    @objc private func showComparison() {\n        guard controller.state == .idle else { return }\n        comparisonWindow.show()\n    }\n\n    func applicationWillTerminate(_ notification: Notification) {\n        controller.comparison.clear()\n    }\n\n"
+    ],
+    "Sources/DictadoMac/DictationController.swift": [
+      "    let comparison = LastDictationComparison()\n",
+      "        // Borrar antes de cualquier guarda: tampoco se conserva ante permisos/fallos.\n        comparison.clear()\n",
+      "            var polishStep = LastDictationComparison.PolishStep.disabled\n",
+      "                    polishStep = .completed\n",
+      "                    polishStep = .fallback\n",
+      "            // Misma transcripción y misma salida usadas arriba; sin repetir ASR/ChatGPT.\n            // Publicar al terminar el pegado evita robar el foco mientras se inserta.\n            comparison.capture(raw: raw, finalText: finalText, step: polishStep)\n"
+    ]
+  }
+}

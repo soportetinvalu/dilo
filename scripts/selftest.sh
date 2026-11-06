@@ -39,4 +39,20 @@ assert 'AUTH-SYNTHETIC-PRIVATE' not in text, 'La salida del login no debe llegar
 print('Privacidad: salida sintética de autenticación ausente del log.')
 PY
   run_login_test "$(command -v python3)" scripts/test-codex-login-mutation.py
+
+  swiftc -parse-as-library -o "${OUT}-comparison" \
+    Sources/DictadoMac/LastDictationComparison.swift \
+    Sources/DictadoMac/DictationComparisonWindow.swift \
+    Sources/DictadoMac/DictationController.swift \
+    SelfTests/DictationComparisonTests.swift
+  run_login_test "${OUT}-comparison" 2>&1 | tee "${OUT}-comparison.txt"
+  python3 - "${OUT}-comparison.txt" <<'PY'
+from pathlib import Path
+import sys
+text = Path(sys.argv[1]).read_text()
+for marker in ['SYNTHETIC-BEFORE-731', 'SYNTHETIC-AFTER-947', 'SYNTHETIC-SECOND-583', 'SYNTHETIC-THIRD-269']:
+    assert marker not in text, 'Los textos sintéticos no deben llegar al log'
+print('Privacidad: textos de comparación ausentes del log del arnés.')
+PY
+  run_login_test "$(command -v python3)" scripts/test-comparison-mutations.py
 fi

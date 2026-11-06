@@ -84,6 +84,16 @@ Notas: con un modificador solo, si pulsas otra tecla a la vez (p. ej. Option+E p
 
 Para ver los registros de la app: `./scripts/run.sh --logs`.
 
+## Comparar el último dictado (build 4)
+
+Después de dictar una vez y esperar la inserción, menú de Dilo → **Ver último antes y después…**.
+Muestra la transcripción local y el texto usado de **esa misma grabación**, con el
+estado real de pulido (completado, apagado o sin respuesta usada). No vuelve a
+llamar a ChatGPT. Solo conserva el último resultado en memoria y lo borra al
+cerrar la ventana, iniciar otro intento de dictado o salir. No es un historial
+ni una mejora del reconocimiento. No permite reconstruir dictados anteriores.
+Privacidad, prueba de una sola grabación y límites: [Tests/COMPARACION.md](Tests/COMPARACION.md).
+
 ## El pulido con ChatGPT (codex)
 
 **Versión 0.1.1, build 3:** conexión gráfica desde **Ajustes → Conectar ChatGPT**.

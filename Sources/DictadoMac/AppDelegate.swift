@@ -15,6 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private var statusItem: NSStatusItem!
     private var settingsWindow: NSWindow?
+    private lazy var comparisonWindow = DictationComparisonWindow(comparison: controller.comparison)
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: Arranque
@@ -115,6 +116,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(disabledItem(String(notice.prefix(90))))
         }
 
+        let compare = NSMenuItem(title: "Ver último antes y después…", action: #selector(showComparison), keyEquivalent: "")
+        compare.target = self
+        compare.isEnabled = controller.state == .idle && controller.comparison.snapshot != nil
+        // NSMenu auto-valida acciones: sin resultado tampoco debe poder habilitarla.
+        if !compare.isEnabled { compare.action = nil }
+        menu.addItem(compare)
+
         menu.addItem(.separator())
         let settingsItem = NSMenuItem(title: "Ajustes…", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
@@ -149,6 +157,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     // MARK: Acciones
+
+    @objc private func showComparison() {
+        guard controller.state == .idle else { return }
+        comparisonWindow.show()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        controller.comparison.clear()
+    }
 
     @objc private func togglePolish() {
         settings.polishEnabled.toggle()

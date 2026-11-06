@@ -39,7 +39,7 @@ class Resources(unittest.TestCase):
         self.assertEqual(p["CFBundleIconFile"], "Dilo.icns")
         self.assertTrue(p["LSUIElement"])
         self.assertEqual(p["CFBundleShortVersionString"], "0.1.1")
-        self.assertEqual(p["CFBundleVersion"], "3")
+        self.assertEqual(p["CFBundleVersion"], "4")
         self.assertIn("Dilo necesita", p["NSMicrophoneUsageDescription"])
 
     def test_original_exact_and_all_icns_pixels(self):
@@ -78,6 +78,17 @@ class Resources(unittest.TestCase):
     def test_functional_sources_preserved(self):
         baseline = json.loads((ROOT / "Tests/dictation-baseline.json").read_text())
         login_delta = json.loads((ROOT / "Tests/chatgpt-login-sources.json").read_text())
+        comparison_delta = json.loads((ROOT / "Tests/comparison-sources.json").read_text())
+        self.assertEqual(comparison_delta["base_commit"], "9f79cf1e2cf937e4931763944ad39fa9969184e9")
+        self.assertEqual(set(comparison_delta["files"]), {
+            "Sources/DictadoMac/AppDelegate.swift", "Sources/DictadoMac/DictationController.swift",
+            "Sources/DictadoMac/LastDictationComparison.swift", "Sources/DictadoMac/DictationComparisonWindow.swift",
+        })
+        self.assertEqual(set(comparison_delta["insertions"]), {
+            "Sources/DictadoMac/AppDelegate.swift", "Sources/DictadoMac/DictationController.swift",
+        })
+        for path, digest in comparison_delta["files"].items():
+            self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), digest, path)
         self.assertEqual(set(login_delta["files"]), {
             "Sources/DictadoMac/AppSettings.swift", "Sources/DictadoMac/TextPolisher.swift",
             "Sources/DictadoMac/SettingsView.swift", "Sources/DictadoMac/CodexConnection.swift",
@@ -89,6 +100,12 @@ class Resources(unittest.TestCase):
                 continue  # Solo delta identificado y fijado arriba, no bloques enmascarados.
             with self.subTest(path=path):
                 data = (ROOT / path).read_bytes()
+                # Solo adiciones exactas identificadas: al quitarlas debe quedar la base
+                # histórica, sin relajar las guardas de ASR, pegado, permisos o pulido.
+                for addition in comparison_delta["insertions"].get(path, []):
+                    block = addition.encode()
+                    self.assertEqual(data.count(block), 1, path)
+                    data = data.replace(block, b"", 1)
                 if path.endswith("AppDelegate.swift"):
                     data = data.replace(b'accessibilityDescription: "Dilo"', b'accessibilityDescription: "Dictado"')
                     data = data.replace(b'Salir de Dilo', b'Salir de Dictado')
